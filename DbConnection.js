@@ -28,10 +28,7 @@ var getConnected = function (sql, params, callback) {
             callback(null);
             return;
           }
-          // console.log(result.metaData);
-          //console.log(result.metaData); // [ { name: 'DEPARTMENT_ID' }, { name: 'DEPARTMENT_NAME' } ]
-          // console.log("check nef", result.rows); // [ [ 180, 'Construction' ] ]
-          //module.exports.rows  = result.rows;
+
           rows = result.rows;
           doRelease(connection);
           callback(rows);

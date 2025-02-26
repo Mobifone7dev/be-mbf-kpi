@@ -2,10 +2,10 @@ const DbConnection = require("../../DbConnection");
 const DbSaleOwnerConnection = require("../../DbSaleOwnerConnection");
 const lowerCaseKeys = require("../../src/utils/helper");
 var moment = require("moment");
-
+const oracledb = require("oracledb");
+oracledb.autoCommit = true;
 class DashboardController {
   index(req, res) {
-    res.send({ result: "hello dashboard" });
 
     // var monthString = req.query.month;
     // const myDate = moment(monthString, "DD-MM-YYYY");
@@ -43,31 +43,38 @@ class DashboardController {
     //           ) v2 ON ( v2.SHOP_CODE = v1.SHOP_CODE )
     // `;
 
-    DbConnection.getConnected(sql, {}, function (result) {
-      if (result) {
-        result.map((item, index) => { });
-      }
-      res.send({ result: result });
-    });
+    // DbConnection.getConnected(sql, {}, function (result) {
+    //   if (result) {
+    //     result.map((item, index) => { });
+    //   }
+    //   res.send({ result: result });
+    // });
+    res.send({ result: "hello wolrd" });
+
   }
-  getDashBoardPlanKpi(req, res) {
+  async getDashBoardPlanKpi(req, res) {
     var monthString = req.query.month;
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    let sql = `select * from db01_owner.chitieu_kpi_2025 where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
     if (monthString && startOfMonth) {
-      let sql = `select * from db01_owner.chitieu_kpi_2025 where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+      DbConnection.getConnected(sql, {}, function (data) {
 
-      DbConnection.getConnected(sql, {}, function (result) {
-        if (result) {
-          result.map((item, index) => { });
+        if (data) {
+          data.map((item, index) => { });
+          console.log(data)
+          res.status(200).json({ result: data }); // This runs as well.
         }
-        res.send({ result: result });
       });
-    }
-    else {
-      res.send({ error: "Có lỗi xảy ra" });
+    } else {
+      res.status(401).json({ error: "có lỗi xảy ra" }); // This runs as well.
 
     }
+
+
+
+
+
   }
 
   getDashBoardExecKpi(req, res) {
@@ -93,9 +100,8 @@ class DashboardController {
         `;
       DbConnection.getConnected(sql, {}, function (result) {
         if (result) {
-          result.map((item, index) => { });
+          res.send({ result: result });
         }
-        res.send({ result: result });
       });
     } else {
       res.send({ error: "Có lỗi xảy ra" });
