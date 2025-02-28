@@ -83,20 +83,35 @@ class DashboardController {
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
     if (monthString && startOfMonth) {
       let sql = `
-        select v1.*, (v1.KHO + v1.DLA + v1.GLA + v1.PYE + v1.DNO + v1.KON) CTY7 from (
-      SELECT * FROM
-      (
-          select ten_chi_tieu,province_code,sum(THUC_HIEN) th
-          from db01_owner.thuc_hien_kpi_2025 
-          where thang = to_date('${startOfMonth}','DD-MM-RRRR')
-          group by ten_chi_tieu,province_code
-      )
-      PIVOT
-      (
-        sum(th)
-        FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON)
-      )
-      ) v1
+          select v1.*, (v1.KHO + v1.DLA + v1.GLA + v1.PYE + v1.DNO + v1.KON) CTY7 from (
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu not in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY','TILE_N_1_GOI','TB_PLAT_TT' )
+              group by ten_chi_tieu,province_code
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON)
+          )
+          ) v1
+          union all
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu  in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY','TILE_N_1_GOI','TB_PLAT_TT' )
+              group by ten_chi_tieu,province_code
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON, 'CTY7' CTY7)
+          )
         `;
       DbConnection.getConnected(sql, {}, function (result) {
         if (result) {
