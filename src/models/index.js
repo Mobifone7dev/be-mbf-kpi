@@ -1,4 +1,5 @@
 const dbConfig = require("../config/dbConfig.js");
+require('dotenv').config();
 
 const { Sequelize, DataTypes } = require("sequelize");
 
@@ -16,10 +17,11 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     idle: dbConfig.pool.idle,
   },
 });
+
+
 sequelize
   .authenticate()
   .then(() => {
-    console.log("db",dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD)
     console.log("connected..");
   })
   .catch((err) => {
@@ -31,23 +33,13 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.salepoint = require("./salePointModel.js")(sequelize, DataTypes);
-db.images = require("./imageModel.js")(sequelize, DataTypes);
+db.menu = require("./menuModel.js")(sequelize, DataTypes);
+db.webUserModel = require("./webUserModel.js")(sequelize, DataTypes);
+db.webUserRoleModel = require("./webUserRoleModel.js")(sequelize, DataTypes);
+db.manualKpi = require("./kpiModel.js")(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("yes re-sync done!");
-});
-
-// 1 to Many Relation
-
-db.salepoint.hasMany(db.images, {
-  foreignKey: "shopID",
-  as: "images",
-});
-
-db.images.belongsTo(db.salepoint, {
-  foreignKey: "shopID",
-  as: "salepoint",
 });
 
 module.exports = db;

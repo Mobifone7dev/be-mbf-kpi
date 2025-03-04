@@ -4,51 +4,14 @@ const lowerCaseKeys = require("../../src/utils/helper");
 var moment = require("moment");
 const oracledb = require("oracledb");
 oracledb.autoCommit = true;
+const db = require("../models");
+const fs = require("fs");
+const ManualKpi = db.manualKpi;
+const { sequelize } = require('../models'); // Import s
+const { query, validationResult } = require("express-validator");
+
 class DashboardController {
   index(req, res) {
-
-    // var monthString = req.query.month;
-    // const myDate = moment(monthString, "DD-MM-YYYY");
-    // const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
-    // const endOfMonth = myDate.endOf("month").format("DD-MM-YYYY");
-
-    // let sql = `WITH SHOP_VIEW AS (
-    //               SELECT * FROM DASHBOARD_KPI_PROVINCE t1
-    //                   WHERE MONTH = ( SELECT MAX(CASE WHEN IN_MONTH <= MAX_MONTH THEN IN_MONTH ELSE MAX_MONTH END) MONTH
-    //                                   FROM ( SELECT MAX(MONTH) MAX_MONTH, to_date('${startOfMonth}', 'dd-mm-yyyy') IN_MONTH FROM DASHBOARD_KPI_PROVINCE ) )
-    //           )
-    //           SELECT '${startOfMonth}' "month", v1.SHOP_CODE "shopCode", v1.SHOP_NAME "shopName", v1.DISPLAY_NAME "displayName", v1.KPI_DOANH_THU "kpiDoanhThu", NVL(v2.DOANH_THU, 0) "doanhThu"
-    //           FROM SHOP_VIEW v1
-    //           LEFT JOIN (
-    //               SELECT MONTH, SHOP_CODE, SUM(COST) DOANH_THU FROM
-    //               (
-    //                   SELECT TRUNC(t3.PAYMENT_MONTH, 'MONTH') MONTH, t2.SHOP_CODE, t4.COST
-    //                   FROM MARKET_PLACE.C7_CONTRACT@marketdr t2
-    //                   LEFT JOIN MARKET_PLACE.C7_CONTRACT_PAYMENT_PREPAID@marketdr t3 ON ( t2.CONTRACT_ID = t3.CONTRACT_ID )
-    //                   lEFT JOIN MARKET_PLACE.C7_CONTRACT_PM_PRE_DETAIL@marketdr t4 ON ( t3.CONTRACT_PAYMENT_PREPAID_ID = t4.PAYMENT_PREPAID_ID )    
-    //                   WHERE t2.DU_AN_CTKV = 0 and t2.HOPDONG_NOIBO = 0 and t2.PRODUCT_ID != '1123'
-    //                     and t3.PAYMENT_MONTH >= to_timestamp('${startOfMonth} 00:00:00', 'dd-mm-yyyy hh24:mi:ss')
-    //                     and t3.PAYMENT_MONTH < to_timestamp('${endOfMonth} 23:59:59', 'dd-mm-yyyy hh24:mi:ss')    
-    //                     and t2.SHOP_CODE IN ( SELECT SHOP_CODE FROM SHOP_VIEW )
-    //                   UNION ALL
-    //                   SELECT TRUNC(t1.CHARGING_MONTH, 'MONTH') MONTH, t2.SHOP_CODE, t1.COST
-    //                   FROM MARKET_PLACE.c7_product_charging_record@marketdr t1
-    //                   LEFT JOIN MARKET_PLACE.C7_CONTRACT@marketdr t2 ON ( t2.CUSTOMER_ID = t1.CUSTOMER_ID and t2.TRANSACTION_ID = t1.CONTRACT_ID)
-    //                   WHERE t1.CHARGING_MONTH >= to_timestamp('${startOfMonth} 00:00:00', 'dd-mm-yyyy hh24:mi:ss') 
-    //                     and t1.CHARGING_MONTH < to_timestamp('${endOfMonth} 23:59:59', 'dd-mm-yyyy hh24:mi:ss')
-    //                     and t2.DU_AN_CTKV = 0 and t2.HOPDONG_NOIBO = 0 and t2.PRODUCT_ID != '1123'
-    //                     and t1.PARENT_PRODUCT_CODE IN ( '3c', 'maicallcenter', 'mtracker', 'siptrunkv2' )
-    //                     and t2.SHOP_CODE IN ( SELECT SHOP_CODE FROM SHOP_VIEW )
-    //               ) GROUP BY MONTH, SHOP_CODE
-    //           ) v2 ON ( v2.SHOP_CODE = v1.SHOP_CODE )
-    // `;
-
-    // DbConnection.getConnected(sql, {}, function (result) {
-    //   if (result) {
-    //     result.map((item, index) => { });
-    //   }
-    //   res.send({ result: result });
-    // });
     res.send({ result: "hello wolrd" });
 
   }
@@ -71,10 +34,102 @@ class DashboardController {
 
     }
 
+  }
+  async createManualKpi(req, res) {
+    const result = validationResult(req);
+    console.log("req", req.body)
+    if (result.isEmpty()) {
+      var monthString = req.body.month;
+      const myDate = moment(monthString, "DD-MM-YYYY");
+      const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+      let info = {
+        nameKpi: req.body.nameKpi,
+        kpi: req.body.kpi,
+        month: startOfMonth,
+        province: req.body.province
+
+      }
+      let orderNumber = returnOrderNumber(info.nameKpi);
+      console.log("orderNumber",orderNumber);
 
 
+      try {
+
+        console.log("Thông tin kpi:", info);
+        const existingKpi = await sequelize.query(
+          `SELECT * FROM db01_owner.thuc_hien_kpi_2025 WHERE ten_chi_tieu = :nameKpi
+           and thang = to_date(:month,'dd-mm-rrrr')
+           and province_code = :provinceCode
+           `,
+          {
+            replacements: { nameKpi: info.nameKpi, month: info.month, provinceCode: info.province },
+            type: sequelize.QueryTypes.SELECT,
+          }
+        );
+        console.log("existingKpi", existingKpi)
+        if (existingKpi.length > 0) {
+          const result = await sequelize.query(
+            `update db01_owner.thuc_hien_kpi_2025 
+            set ten_chi_tieu =:nameKpi,
+            thang = to_date(:month,'dd-mm-rrrr'),
+            last_date =:lastDate,
+            province_code =:provinceCode,
+            thuc_hien =:kpi,
+            order_number =:orderNumber
+            WHERE ten_chi_tieu = :nameKpi and thang = to_date(:month,'dd-mm-rrrr')
+            `,
+            {
+              replacements: {
+                nameKpi: info.nameKpi,
+                month: info.month,
+                lastDate: new Date(),
+                provinceCode: info.province,
+                kpi: info.kpi,
+                orderNumber: orderNumber
+              },
+              type: sequelize.QueryTypes.UPDATE,
+            }
+          );
+          res.send({ data: result })
+
+        } else {
+          const result = await sequelize.query(
+            `insert into  db01_owner.thuc_hien_kpi_2025 
+          (ten_chi_tieu, thang, last_date, province_code, district_code,thuc_hien, order_number)
+          values
+          (
+          :nameKpi,
+           to_date(:month,'dd-mm-rrrr'),
+          :lastDate,
+          :provinceCode,
+          '',
+          :kpi,
+          :orderNumber
+          )
+            `,
+            {
+              replacements: {
+                nameKpi: info.nameKpi,
+                month: info.month,
+                lastDate: new Date(),
+                provinceCode: info.province,
+                kpi: info.kpi,
+                orderNumber: orderNumber
+              },
+              type: sequelize.QueryTypes.INSERT,
+            }
+          );
+          res.send({ data: result })
 
 
+        }
+
+
+      } catch (error) {
+        throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+      }
+    }
   }
 
   getDashBoardExecKpi(req, res) {
@@ -126,6 +181,22 @@ class DashboardController {
 
   show(req, res) {
     res.send("detail");
+  }
+}
+const returnOrderNumber = (nameKpi) => {
+  switch (nameKpi) {
+    case 'DTHU_FIBER':
+      return '2';
+    case 'DTHU_MASS':
+      return '3.1';
+    case 'DTHU_DUAN':
+      return '3.2';
+    case 'DTHU_GPS':
+      return '6';
+    case 'TB_PLAT_TT':
+      return '8.2';
+     default: '0';
+
   }
 }
 module.exports = new DashboardController();
