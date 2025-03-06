@@ -25,7 +25,6 @@ class DashboardController {
 
         if (data) {
           data.map((item, index) => { });
-          console.log(data)
           res.status(200).json({ result: data }); // This runs as well.
         }
       });
@@ -37,7 +36,6 @@ class DashboardController {
   }
   async createManualKpi(req, res) {
     const result = validationResult(req);
-    console.log("req", req.body)
     if (result.isEmpty()) {
       var monthString = req.body.month;
       const myDate = moment(monthString, "DD-MM-YYYY");
@@ -50,12 +48,10 @@ class DashboardController {
 
       }
       let orderNumber = returnOrderNumber(info.nameKpi);
-      console.log("orderNumber",orderNumber);
 
 
       try {
 
-        console.log("Thông tin kpi:", info);
         const existingKpi = await sequelize.query(
           `SELECT * FROM db01_owner.thuc_hien_kpi_2025 WHERE ten_chi_tieu = :nameKpi
            and thang = to_date(:month,'dd-mm-rrrr')
@@ -66,7 +62,6 @@ class DashboardController {
             type: sequelize.QueryTypes.SELECT,
           }
         );
-        console.log("existingKpi", existingKpi)
         if (existingKpi.length > 0) {
           const result = await sequelize.query(
             `update db01_owner.thuc_hien_kpi_2025 
@@ -134,98 +129,121 @@ class DashboardController {
 
   async createManualListKpi(req, res) {
     const result = validationResult(req);
-    console.log("req", req.body)
     if (result.isEmpty()) {
       var monthString = req.body.month;
       const myDate = moment(monthString, "DD-MM-YYYY");
       const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
-      let info = {
-        nameKpi: req.body.nameKpi,
-        kpi: req.body.kpi,
-        month: startOfMonth,
-        province: req.body.province
+      const kpiList = req.body.kpiList;
+      if (kpiList && kpiList.length > 0) {
+        try {
+          console.log("kpiList", kpiList);
+          for (const object of kpiList) {
+            let info = {
+              nameKpi: object.id,
+              kpi: object.value,
+              month: startOfMonth,
+              province: object.province
 
-      }
-      let orderNumber = returnOrderNumber(info.nameKpi);
-      console.log("orderNumber",orderNumber);
-
-
-      try {
-
-        console.log("Thông tin kpi:", info);
-        const existingKpi = await sequelize.query(
-          `SELECT * FROM db01_owner.thuc_hien_kpi_2025 WHERE ten_chi_tieu = :nameKpi
-           and thang = to_date(:month,'dd-mm-rrrr')
-           and province_code = :provinceCode
-           `,
-          {
-            replacements: { nameKpi: info.nameKpi, month: info.month, provinceCode: info.province },
-            type: sequelize.QueryTypes.SELECT,
-          }
-        );
-        console.log("existingKpi", existingKpi)
-        if (existingKpi.length > 0) {
-          const result = await sequelize.query(
-            `update db01_owner.thuc_hien_kpi_2025 
-            set ten_chi_tieu =:nameKpi,
-            thang = to_date(:month,'dd-mm-rrrr'),
-            last_date =:lastDate,
-            province_code =:provinceCode,
-            thuc_hien =:kpi,
-            order_number =:orderNumber
-            WHERE ten_chi_tieu = :nameKpi and thang = to_date(:month,'dd-mm-rrrr')
-            `,
-            {
-              replacements: {
-                nameKpi: info.nameKpi,
-                month: info.month,
-                lastDate: new Date(),
-                provinceCode: info.province,
-                kpi: info.kpi,
-                orderNumber: orderNumber
-              },
-              type: sequelize.QueryTypes.UPDATE,
             }
-          );
-          res.send({ data: result })
+            let orderNumber = returnOrderNumber(info.nameKpi);
 
-        } else {
-          const result = await sequelize.query(
-            `insert into  db01_owner.thuc_hien_kpi_2025 
-          (ten_chi_tieu, thang, last_date, province_code, district_code,thuc_hien, order_number)
-          values
-          (
-          :nameKpi,
-           to_date(:month,'dd-mm-rrrr'),
-          :lastDate,
-          :provinceCode,
-          '',
-          :kpi,
-          :orderNumber
-          )
-            `,
-            {
-              replacements: {
-                nameKpi: info.nameKpi,
-                month: info.month,
-                lastDate: new Date(),
-                provinceCode: info.province,
-                kpi: info.kpi,
-                orderNumber: orderNumber
-              },
-              type: sequelize.QueryTypes.INSERT,
+            const existingKpi = await sequelize.query(
+              `SELECT * FROM db01_owner.thuc_hien_kpi_2025 WHERE ten_chi_tieu = :nameKpi
+               and thang = to_date(:month,'dd-mm-rrrr')
+               and province_code = :provinceCode
+               `,
+              {
+                replacements: { nameKpi: info.nameKpi, month: info.month, provinceCode: info.province },
+                type: sequelize.QueryTypes.SELECT,
+              }
+            );
+            if (existingKpi.length > 0) {
+              const resultDelete = await sequelize.query(
+                `delete from db01_owner.thuc_hien_kpi_2025 
+                WHERE ten_chi_tieu = :nameKpi and thang = to_date(:month,'dd-mm-rrrr')
+                and province_code =:provinceCode
+                `,
+                {
+                  replacements: {
+                    nameKpi: info.nameKpi,
+                    month: info.month,
+                    lastDate: new Date(),
+                    provinceCode: info.province,
+                    kpi: info.kpi,
+                    orderNumber: orderNumber
+                  },
+                  type: sequelize.QueryTypes.DELETE,
+                }
+              );
+              await sequelize.query(
+                `insert into  db01_owner.thuc_hien_kpi_2025 
+                (ten_chi_tieu, thang, last_date, province_code, district_code,thuc_hien, order_number)
+                values
+                (
+                :nameKpi,
+                 to_date(:month,'dd-mm-rrrr'),
+                :lastDate,
+                :provinceCode,
+                '',
+                :kpi,
+                :orderNumber
+                )
+                  `,
+                {
+                  replacements: {
+                    nameKpi: info.nameKpi,
+                    month: info.month,
+                    lastDate: new Date(),
+                    provinceCode: info.province,
+                    kpi: info.kpi,
+                    orderNumber: orderNumber
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
+              console.log("check ne", result);
+
+            } else {
+              const result = await sequelize.query(
+                `insert into  db01_owner.thuc_hien_kpi_2025 
+              (ten_chi_tieu, thang, last_date, province_code, district_code,thuc_hien, order_number)
+              values
+              (
+              :nameKpi,
+               to_date(:month,'dd-mm-rrrr'),
+              :lastDate,
+              :provinceCode,
+              '',
+              :kpi,
+              :orderNumber
+              )
+                `,
+                {
+                  replacements: {
+                    nameKpi: info.nameKpi,
+                    month: info.month,
+                    lastDate: new Date(),
+                    provinceCode: info.province,
+                    kpi: info.kpi,
+                    orderNumber: orderNumber
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
             }
-          );
-          res.send({ data: result })
+            console.log("check ne", result);
+          };
+          res.send({ data: { sussess: true } })
+        } catch (error) {
+          throw new Error(`Có lỗi xảy ra:  ${error}`)
 
 
         }
 
-
-      } catch (error) {
-        throw new Error(`Có lỗi xảy ra:  ${error}`)
-
       }
+
     }
   }
 
@@ -292,7 +310,7 @@ const returnOrderNumber = (nameKpi) => {
       return '6';
     case 'TB_PLAT_TT':
       return '8.2';
-     default: '0';
+    default: '0';
 
   }
 }
