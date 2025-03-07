@@ -256,11 +256,11 @@ class DashboardController {
           select v1.*, (v1.KHO + v1.DLA + v1.GLA + v1.PYE + v1.DNO + v1.KON) CTY7 from (
           SELECT * FROM
           (
-              select ten_chi_tieu,province_code,sum(THUC_HIEN) th
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
               from db01_owner.thuc_hien_kpi_2025 
               where thang = to_date('${startOfMonth}','DD-MM-RRRR')
               and ten_chi_tieu not in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY','TILE_N_1_GOI','TB_PLAT_TT' )
-              group by ten_chi_tieu,province_code
+              group by ten_chi_tieu,province_code,last_date
           )
           PIVOT
           (
@@ -271,11 +271,11 @@ class DashboardController {
           union all
           SELECT * FROM
           (
-              select ten_chi_tieu,province_code,sum(THUC_HIEN) th
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
               from db01_owner.thuc_hien_kpi_2025 
               where thang = to_date('${startOfMonth}','DD-MM-RRRR')
               and ten_chi_tieu  in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY','TILE_N_1_GOI','TB_PLAT_TT' )
-              group by ten_chi_tieu,province_code
+              group by ten_chi_tieu,province_code, last_date
           )
           PIVOT
           (
