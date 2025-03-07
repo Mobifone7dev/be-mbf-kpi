@@ -312,6 +312,8 @@ const returnOrderNumber = (nameKpi) => {
       return '6';
     case 'TB_PLAT_TT':
       return '8.2';
+    case 'TI_LE_DN_SU_DUNG_GP_MBF':
+      return '8.2';
     default: '0';
 
   }
