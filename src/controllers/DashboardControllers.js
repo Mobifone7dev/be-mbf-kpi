@@ -295,6 +295,39 @@ class DashboardController {
     }
   }
 
+  exportExcelExecKpi(req, res) {
+    console.log("==== API exportRawDashBoardExecKpi ĐÃ ĐƯỢC GỌI ====");
+
+    const { month, kpiType } = req.query;
+    console.log("Tham số nhận được:", { month, kpiType });
+
+    if (!month || !kpiType) {
+        console.log("Thiếu tham số đầu vào!");
+        return res.status(400).json({ error: "Thiếu tham số đầu vào" });
+    }
+    
+    const formattedMonth = moment(month, "DD-MM-YYYY").format("MM/YYYY");
+    
+    let sql = `
+        SELECT *
+        FROM db01_owner.th_tb_ptm_kpi_2025
+        WHERE TO_CHAR(MONTH, 'MM/YYYY') = '${formattedMonth}'
+          AND ${kpiType} = '1'
+    `;
+    
+    console.log("Executing SQL:", sql);
+
+    DbConnection.getConnected(sql, {}, function (result) {
+        if (result) {
+            console.log("Query thành công, số bản ghi:", result.length);
+            res.json({ result });
+        } else {
+            console.log("Lỗi truy vấn dữ liệu!");
+            res.status(500).json({ error: "Lỗi truy vấn dữ liệu" });
+        }
+    });
+}
+
 
   show(req, res) {
     res.send("detail");
