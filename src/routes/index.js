@@ -9,6 +9,7 @@ function route(app) {
   });
   app.post("/login", authenticateRouter);
   app.use("/dashboard", authenticateToken, dashboardRouter);
+
 }
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
