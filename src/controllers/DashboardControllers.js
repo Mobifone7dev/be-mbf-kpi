@@ -146,6 +146,9 @@ class DashboardController {
 
             }
             let orderNumber = returnOrderNumber(info.nameKpi);
+            let lastDate = new Date();
+            lastDate = returnLastDate(info.nameKpi, req.body)
+
 
             const existingKpi = await sequelize.query(
               `SELECT * FROM db01_owner.thuc_hien_kpi_2025 WHERE ten_chi_tieu = :nameKpi
@@ -167,10 +170,7 @@ class DashboardController {
                   replacements: {
                     nameKpi: info.nameKpi,
                     month: info.month,
-                    lastDate: new Date(),
                     provinceCode: info.province,
-                    kpi: info.kpi,
-                    orderNumber: orderNumber
                   },
                   type: sequelize.QueryTypes.DELETE,
                 }
@@ -193,7 +193,7 @@ class DashboardController {
                   replacements: {
                     nameKpi: info.nameKpi,
                     month: info.month,
-                    lastDate: new Date(),
+                    lastDate: lastDate,
                     provinceCode: info.province,
                     kpi: info.kpi,
                     orderNumber: orderNumber
@@ -354,6 +354,25 @@ const returnOrderNumber = (nameKpi) => {
       return '8.2';
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
       return '8.2';
+    default: '0';
+
+  }
+}
+
+const returnLastDate = (nameKpi, object) => {
+  switch (nameKpi) {
+    case 'DTHU_FIBER':
+      return object.dateUpdateFiber ? new Date(object.dateUpdateFiber) : new Date;
+    case 'DTHU_MASS':
+      return object.dateUpdateDthuMass ? new Date(object.dateUpdateDthuMass) : new Date;
+    case 'DTHU_DUAN':
+      return object.dateUpdateDthuDuan ? new Date(object.dateUpdateDthuDuan) : new Date;
+    case 'DTHU_GPS':
+      return object.dateUpdateDthuGps ? new Date(object.dateUpdateDthuGps) : new Date;
+    case 'TB_PLAT_TT':
+      return object.dateUpdateTbPlatTT ? new Date(object.dateUpdateTbPlatTT) : new Date;
+    case 'TI_LE_DN_SU_DUNG_GP_MBF':
+      return object.dateUpdateGpMbf ? new Date(object.dateUpdateGpMbf) : new Date;
     default: '0';
 
   }
