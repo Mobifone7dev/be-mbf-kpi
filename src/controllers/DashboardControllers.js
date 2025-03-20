@@ -352,6 +352,10 @@ const returnOrderNumber = (nameKpi) => {
       return '6';
     case 'TB_PLAT_TT':
       return '8.2';
+    case 'SL_C2C':
+      return '7.1';
+    case 'TYLE_GD_C2C':
+      return '7.3';
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
       return '8.2';
     default: '0';
@@ -371,6 +375,10 @@ const returnLastDate = (nameKpi, object) => {
       return object.dateUpdateDthuGps ? new Date(object.dateUpdateDthuGps) : new Date;
     case 'TB_PLAT_TT':
       return object.dateUpdateTbPlatTT ? new Date(object.dateUpdateTbPlatTT) : new Date;
+    case 'SL_C2C':
+      return object.dateUpdateSLC2C ? new Date(object.dateUpdateSLC2C) : new Date;
+    case 'TYLE_GD_C2C':
+      return object.dateUpdateTYLEGDC2C ? new Date(object.dateUpdateTYLEGDC2C) : new Date;
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
       return object.dateUpdateGpMbf ? new Date(object.dateUpdateGpMbf) : new Date;
     default: '0';
