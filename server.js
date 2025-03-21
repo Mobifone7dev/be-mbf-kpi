@@ -9,7 +9,7 @@ const https = require('https')
 const hsts = require('hsts')
 const helmet = require('helmet');
 const app = express();
-const PORT = 8104;
+const PORT = 8110;
 var certificate = fs.readFileSync('/usr/local/ssl/certificate/tracuu7/cert_tracuu7_161024.crt');
 var privateKey = fs.readFileSync('/usr/local/ssl/certificate/tracuu7/private_tracuu7.key')
 require('dotenv').config();
