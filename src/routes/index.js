@@ -2,6 +2,8 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const dashboardRouter = require("./DashBoard");
 const authenticateRouter = require("./Authenticate");
+const userRoleRouter = require("./UserRole");
+
 
 function route(app) {
   app.get("/", function (req, res) {
@@ -9,6 +11,7 @@ function route(app) {
   });
   app.post("/login", authenticateRouter);
   app.use("/dashboard", authenticateToken, dashboardRouter);
+  app.use("/user-role", authenticateToken, userRoleRouter);
 
 }
 function authenticateToken(req, res, next) {

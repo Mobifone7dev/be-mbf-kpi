@@ -1,20 +1,23 @@
 module.exports = (sequelize, DataTypes) => {
-    const Menu = sequelize.define(
-      `menu`,
-      {
-        menuId: {
-          type: DataTypes.STRING,
-          field:'menu_id'
-        },
-        menuName: {
-          type: DataTypes.STRING,
-          field:'nemu_name'
-        },
+  const Menu = sequelize.define(
+    `menu`,
+    {
+      menuId: {
+        type: DataTypes.STRING,
+        field: 'menu_id',
+        primaryKey: true
       },
-      {
-        freezeTableName: true,
-      }
-    );
-  
-    return Menu;
-  };
+      menuName: {
+        type: DataTypes.STRING,
+        field: 'menu_name'
+      },
+    },
+    {
+      freezeTableName: true,
+      createdAt: false,
+      updatedAt: false,
+    }
+  );
+
+  return Menu;
+};
