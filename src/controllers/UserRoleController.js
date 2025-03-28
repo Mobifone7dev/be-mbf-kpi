@@ -73,20 +73,37 @@ class UserRoleController {
                         replacements: { userEmail: userEmail },
                         type: sequelize.QueryTypes.SELECT,
                     });
-                if (existingUserEmail && province && province.length > 0) {
-                    await sequelize.query(
-                        `update web_user
-                         set province =:province
-                            WHERE user_email = :userEmail
-                            `,
-                        {
-                            replacements: {
-                                province: province,
-                                userEmail: userEmail
-                            },
-                            type: sequelize.QueryTypes.UPDATE,
-                        }
-                    );
+                if (existingUserEmail) {
+                    if (province && province.length > 0) {
+                        await sequelize.query(
+                            `update web_user
+                             set province =:province
+                                WHERE user_email = :userEmail
+                                `,
+                            {
+                                replacements: {
+                                    province: province,
+                                    userEmail: userEmail
+                                },
+                                type: sequelize.QueryTypes.UPDATE,
+                            }
+                        );
+                    } else {
+                        await sequelize.query(
+                            `update web_user
+                             set province =:province
+                                WHERE user_email = :userEmail
+                                `,
+                            {
+                                replacements: {
+                                    province: null,
+                                    userEmail: userEmail
+                                },
+                                type: sequelize.QueryTypes.UPDATE,
+                            }
+                        );
+                    }
+
 
                 }
 

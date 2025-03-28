@@ -16,10 +16,25 @@ class DashboardController {
 
   }
   async getDashBoardPlanKpi(req, res) {
-    var monthString = req.query.month;
+    let monthString = req.query.month;
+    let province = req.query.province ? req.query.province : '';
+
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
-    let sql = `select * from db01_owner.chitieu_kpi_2025 where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+    let sql;
+    if (province && province.length > 0) {
+      if (province == 'CTY7') {
+        sql = `select * from db01_owner.chitieu_kpi_2025 where thang= to_date('${startOfMonth}','DD-MM-RRRR')`
+      } else {
+        sql = `select THANG, STT, TEN_CHI_TIEU, ${province}, DONVI from db01_owner.chitieu_kpi_2025 where thang= to_date('${startOfMonth}','DD-MM-RRRR')`
+      }
+    } else {
+      sql = `select * from db01_owner.chitieu_kpi_2025 where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+
+    }
+
+
+
     if (monthString && startOfMonth) {
       DbConnection.getConnected(sql, {}, function (data) {
 
@@ -33,6 +48,132 @@ class DashboardController {
 
     }
 
+  }
+
+  getDashBoardExecKpi(req, res) {
+    var monthString = req.query.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    let province = req.query.province ? req.query.province : '';
+
+    if (monthString && startOfMonth) {
+      let sql;
+      if (province && province.length > 0) {
+        if (province == 'CTY7') {
+          sql = `
+          select v1.*, (v1.KHO + v1.DLA + v1.GLA + v1.PYE + v1.DNO + v1.KON) CTY7 from (
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu not in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
+              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
+              group by ten_chi_tieu,province_code,last_date
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON)
+          )
+          ) v1
+          union all
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu  in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
+              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
+              group by ten_chi_tieu,province_code, last_date
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON, 'CTY7' CTY7)
+          )
+        `;
+        } else {
+          sql = `
+          select v1.* from (
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu not in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
+              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
+              group by ten_chi_tieu,province_code,last_date
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('${province}' ${province})
+          )
+          ) v1
+          union all
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu  in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
+              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
+              group by ten_chi_tieu,province_code, last_date
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('${province}' ${province})
+          )
+        `;
+        }
+        console.log("sql", sql)
+      } else {
+        sql = `
+          select v1.*, (v1.KHO + v1.DLA + v1.GLA + v1.PYE + v1.DNO + v1.KON) CTY7 from (
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu not in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
+              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
+              group by ten_chi_tieu,province_code,last_date
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON)
+          )
+          ) v1
+          union all
+          SELECT * FROM
+          (
+              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
+              from db01_owner.thuc_hien_kpi_2025 
+              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
+              and ten_chi_tieu  in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
+              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
+              group by ten_chi_tieu,province_code, last_date
+          )
+          PIVOT
+          (
+            sum(th)
+            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON, 'CTY7' CTY7)
+          )
+        `;
+
+      }
+
+      DbConnection.getConnected(sql, {}, function (result) {
+        if (result) {
+          res.send({ result: result });
+        }
+      });
+    } else {
+      res.send({ error: "Có lỗi xảy ra" });
+    }
   }
   async createManualKpi(req, res) {
     const result = validationResult(req);
@@ -247,53 +388,7 @@ class DashboardController {
     }
   }
 
-  getDashBoardExecKpi(req, res) {
-    var monthString = req.query.month;
-    const myDate = moment(monthString, "DD-MM-YYYY");
-    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
-    if (monthString && startOfMonth) {
-      let sql = `
-          select v1.*, (v1.KHO + v1.DLA + v1.GLA + v1.PYE + v1.DNO + v1.KON) CTY7 from (
-          SELECT * FROM
-          (
-              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
-              from db01_owner.thuc_hien_kpi_2025 
-              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
-              and ten_chi_tieu not in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
-              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
-              group by ten_chi_tieu,province_code,last_date
-          )
-          PIVOT
-          (
-            sum(th)
-            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON)
-          )
-          ) v1
-          union all
-          SELECT * FROM
-          (
-              select ten_chi_tieu,province_code,sum(THUC_HIEN) th, max(last_date) last_date
-              from db01_owner.thuc_hien_kpi_2025 
-              where thang = to_date('${startOfMonth}','DD-MM-RRRR')
-              and ten_chi_tieu  in ( 'TILE_MNP','TI_LE_N_1_DAIKY','TILE_N_1_DONKY',
-              'TILE_N_1_GOI','TB_PLAT_TT','TI_LE_DN_SU_DUNG_GP_MBF','TYLE_GD_C2C' )
-              group by ten_chi_tieu,province_code, last_date
-          )
-          PIVOT
-          (
-            sum(th)
-            FOR province_code IN ('KHO' KHO, 'DLA' DLA, 'GLA' GLA, 'PYE' PYE, 'DNO' DNO, 'KON' KON, 'CTY7' CTY7)
-          )
-        `;
-      DbConnection.getConnected(sql, {}, function (result) {
-        if (result) {
-          res.send({ result: result });
-        }
-      });
-    } else {
-      res.send({ error: "Có lỗi xảy ra" });
-    }
-  }
+
 
   exportExcelExecKpi(req, res) {
     console.log("==== API exportRawDashBoardExecKpi ĐÃ ĐƯỢC GỌI ====");
