@@ -463,22 +463,24 @@ const returnOrderNumber = (nameKpi) => {
 const returnLastDate = (nameKpi, object) => {
   switch (nameKpi) {
     case 'DTHU_FIBER':
-      return object.dateUpdateFiber ? new Date(object.dateUpdateFiber) : new Date;
+      return object.dateUpdateFiber ? new Date(object.dateUpdateFiber) : new Date();
+    case 'DTHU_CLOUD_DC':
+      return object.dateUpdateCloudDC ? new Date(object.dateUpdateCloudDC) : new Date();
     case 'DTHU_MASS':
-      return object.dateUpdateDthuMass ? new Date(object.dateUpdateDthuMass) : new Date;
+      return object.dateUpdateDthuMass ? new Date(object.dateUpdateDthuMass) : new Date();
     case 'DTHU_DUAN':
-      return object.dateUpdateDthuDuan ? new Date(object.dateUpdateDthuDuan) : new Date;
+      return object.dateUpdateDthuDuan ? new Date(object.dateUpdateDthuDuan) : new Date();
     case 'DTHU_GPS':
-      return object.dateUpdateDthuGps ? new Date(object.dateUpdateDthuGps) : new Date;
+      return object.dateUpdateDthuGps ? new Date(object.dateUpdateDthuGps) : new Date();
     case 'TB_PLAT_TT':
-      return object.dateUpdateTbPlatTT ? new Date(object.dateUpdateTbPlatTT) : new Date;
+      return object.dateUpdateTbPlatTT ? new Date(object.dateUpdateTbPlatTT) : new Date();
     case 'SL_C2C':
-      return object.dateUpdateSLC2C ? new Date(object.dateUpdateSLC2C) : new Date;
+      return object.dateUpdateSLC2C ? new Date(object.dateUpdateSLC2C) : new Date();
     case 'TYLE_GD_C2C':
-      return object.dateUpdateTYLEGDC2C ? new Date(object.dateUpdateTYLEGDC2C) : new Date;
+      return object.dateUpdateTYLEGDC2C ? new Date(object.dateUpdateTYLEGDC2C) : new Date();
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
-      return object.dateUpdateGpMbf ? new Date(object.dateUpdateGpMbf) : new Date;
-    default: '0';
+      return object.dateUpdateGpMbf ? new Date(object.dateUpdateGpMbf) : new Date();
+    default: return new Date();
 
   }
 }
