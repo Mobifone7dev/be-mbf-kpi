@@ -455,7 +455,7 @@ const returnOrderNumber = (nameKpi) => {
       return '7.3';
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
       return '8.2';
-    default: '0';
+    default: return '0';
 
   }
 }
