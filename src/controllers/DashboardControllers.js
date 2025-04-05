@@ -480,6 +480,8 @@ const returnLastDate = (nameKpi, object) => {
       return object.dateUpdateTYLEGDC2C ? new Date(object.dateUpdateTYLEGDC2C) : new Date();
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
       return object.dateUpdateGpMbf ? new Date(object.dateUpdateGpMbf) : new Date();
+      case 'SL_HD_GPS_KHDN':
+        return object.dateUpdate_SL_HD_GPS_KHDN ? new Date(object.dateUpdate_SL_HD_GPS_KHDN) : new Date();
     default: return new Date();
 
   }
