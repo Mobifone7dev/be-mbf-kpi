@@ -16,7 +16,7 @@ class DashboardThiduaController {
 
     }
     getThiduaMobiAgri(req, res) {
-        const query = `select count(isdn), province_pt, active_date
+        const query = `select count(isdn) quantity, province_pt, active_date
         from(
         select t1.*, TEN_CHUONG_TRINH, NOI_DUNG, KEY, VALUE_NUMBER
         from db01_owner.TH_TB_PTM_KPI_2025 t1
