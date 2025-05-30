@@ -62,5 +62,32 @@ class DashboardThiduaController {
                 res.status(500).json({ error: "Internal Server Error" });
             });
     }
+
+    getSoluongPTMThiduaM2M(req, res) {
+        const query = `select count(isdn), province_pt, active_date
+        from(
+        select t1.*, TEN_CHUONG_TRINH, NOI_DUNG, ISSUE_DATE, KEY, VALUE_STRING
+        from db01_owner.TH_TB_PTM_KPI_2025 t1
+        inner join (
+            select * from an_owner.DU_LIEU_CHUONG_TRINH_THI_DUA
+            where NOI_DUNG = 'PTM_TB_M2M'
+        ) t2 ON ( t2.LOAITB = t1.LOAITB and t2.MONTH = t1.MONTH and t2.ISDN = t1.ISDN and t2.SUB_ID = t1.SUB_ID )
+        WHERE t1.ACTIVE_DATE >= to_date('26-05-2025', 'dd-mm-yyyy') 
+            and t1.ACTIVE_DATE < to_date('01-07-2025', 'dd-mm-yyyy') 
+        )
+        group by province_pt,active_date
+        order by province_pt,active_date`;
+        sequelize.query(query, {
+            replacements: {},
+            type: sequelize.QueryTypes.SELECT
+        })
+            .then(data => {
+                res.json({ data });
+            })
+            .catch(err => {
+                console.error("Error fetching Thidua MobiAgri data:", err);
+                res.status(500).json({ error: "Internal Server Error" });
+            });
+    }
 }
 module.exports = new DashboardThiduaController();
