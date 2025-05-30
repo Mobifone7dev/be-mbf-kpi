@@ -64,7 +64,7 @@ class DashboardThiduaController {
     }
 
     getSoluongPTMThiduaM2M(req, res) {
-        const query = `select count(isdn), province_pt, active_date
+        const query = `select count(isdn) quantity, province_pt, active_date
         from(
         select t1.*, TEN_CHUONG_TRINH, NOI_DUNG, ISSUE_DATE, KEY, VALUE_STRING
         from db01_owner.TH_TB_PTM_KPI_2025 t1
