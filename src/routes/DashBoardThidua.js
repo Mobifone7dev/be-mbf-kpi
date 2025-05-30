@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/DashboardThiduaController");
-router.get("/thidua-mobiagri", controller.getThiduaMobiAgri);
+router.get("/sl-thidua-mobiagri", controller.getSoluongPTMThiduaMobiAgri);
 
 router.use("/", controller.index);
 

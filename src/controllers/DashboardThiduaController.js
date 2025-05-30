@@ -15,15 +15,12 @@ class DashboardThiduaController {
         res.send({ result: "hello wolrd" });
 
     }
-    getThiduaMobiAgri(req, res) {
-        const query = `select count(isdn) quantity, province_pt, active_date
+    getSoluongPTMThiduaMobiAgri(req, res) {
+        const query = `select count(isdn), province_pt, active_date
         from(
-        select t1.*, TEN_CHUONG_TRINH, NOI_DUNG, KEY, VALUE_NUMBER
-        from db01_owner.TH_TB_PTM_KPI_2025 t1
-        left join ( select * from an_owner.DU_LIEU_CHUONG_TRINH_THI_DUA
-                    where TEN_CHUONG_TRINH = 'THI_DUA_QUY_II/2025' and NOI_DUNG = 'PTM_TB_Platform_Mobi_Agri'
-        ) t2 ON ( t2.MONTH = t1.MONTH and t2.ISDN = t1.ISDN and t2.SUB_ID = t1.SUB_ID )
-        where t1.ACTIVE_DATE >= to_date('23-05-2025', 'dd-mm-yyyy') and t1.ACTIVE_DATE < to_date('01-07-2025', 'dd-mm-yyyy')
+        select * from db01_owner.TH_TB_PTM_KPI_2025 t1
+        where t1.ACTIVE_DATE >= to_date('23-05-2025', 'dd-mm-yyyy') 
+            and t1.ACTIVE_DATE < to_date('01-07-2025', 'dd-mm-yyyy')
             and t1.NEN_TANG_NDS = 'mobiAgri'
         )
         group by province_pt,active_date
