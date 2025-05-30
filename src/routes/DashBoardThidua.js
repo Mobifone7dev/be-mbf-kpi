@@ -3,6 +3,6 @@ const router = express.Router();
 const controller = require("../controllers/DashboardThiduaController");
 router.get("/thidua-mobiagri", controller.getThiduaMobiAgri);
 
-router.use("/", dashboardController.index);
+router.use("/", controller.index);
 
 module.exports = router;
