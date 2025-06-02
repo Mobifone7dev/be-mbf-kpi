@@ -107,6 +107,35 @@ class DashboardThiduaController {
             });
     }
 
+    getDoanhthuCloud(req, res) {
+        const query = `select * from THIDUA_CLOUD_30062025`;
+        sequelize.query(query, {
+            replacements: {},
+            type: sequelize.QueryTypes.SELECT
+        })
+            .then(data => {
+                res.json({ data });
+            })
+            .catch(err => {
+                console.error("Error fetching Thidua  data:", err);
+                res.status(500).json({ error: "Internal Server Error" });
+            });
+    }
+
+    getDoanhthuIOT(req, res) {
+        const query = `select * from THIDUA_IOT_30062025`;
+        sequelize.query(query, {
+            replacements: {},
+            type: sequelize.QueryTypes.SELECT
+        })
+            .then(data => {
+                res.json({ data });
+            })
+            .catch(err => {
+                console.error("Error fetching Thidua  data:", err);
+                res.status(500).json({ error: "Internal Server Error" });
+            });
+    }
     getSoluongPTMThiduaM2M(req, res) {
         const query = `select count(isdn) quantity, province_pt, active_date
         from(
@@ -231,7 +260,7 @@ class DashboardThiduaController {
         }
     }
 
-     async createManualListCloud(req, res) {
+    async createManualListCloud(req, res) {
         const result = validationResult(req);
         if (result.isEmpty()) {
             var dateString = req.body.date;
