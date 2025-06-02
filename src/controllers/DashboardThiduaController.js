@@ -133,5 +133,200 @@ class DashboardThiduaController {
                 res.status(500).json({ error: "Internal Server Error" });
             });
     }
+
+    async createManualListIOT(req, res) {
+        const result = validationResult(req);
+        if (result.isEmpty()) {
+            var dateString = req.body.date;
+            const kpiList = req.body.kpiList;
+            if (kpiList && kpiList.length > 0) {
+                try {
+                    console.log("kpiList", kpiList);
+                    for (const object of kpiList) {
+                        let info = {
+                            amount: object.amount,
+                            date: object.date,
+                            province: object.province
+
+                        }
+
+                        const existingKpi = await sequelize.query(
+                            `SELECT * THIDUA_IOT_30062025 WHERE date = :date
+                                and province_code = :province
+                                `,
+                            {
+                                replacements: { data: date, province: info.province },
+                                type: sequelize.QueryTypes.SELECT,
+                            }
+                        );
+                        if (existingKpi.length > 0) {
+                            await sequelize.query(
+                                `delete from THIDUA_IOT_30062025 
+                                        WHERE  date = :date
+                                    and province_code = :province
+                                        `,
+                                {
+                                    replacements: {
+                                        date: date,
+                                        province: province,
+                                    },
+                                    type: sequelize.QueryTypes.DELETE,
+                                }
+                            );
+                            await sequelize.query(
+                                `insert into  THIDUA_IOT_30062025 
+                                (date, province, amount)
+                                values
+                                (
+                                to_date(:date,'dd-mm-rrrr'),
+                                :province,
+                                :amount
+                                    )
+                                `,
+                                {
+                                    replacements: {
+                                        date: date,
+                                        province: province,
+                                        amount: amount
+                                    },
+                                    type: sequelize.QueryTypes.INSERT,
+                                }
+                            );
+
+                            console.log("check ne", result);
+
+                        } else {
+
+                            await sequelize.query(
+                                `insert into  THIDUA_IOT_30062025 
+                                    (date, province, amount)
+                                    values
+                                    (
+                                    to_date(:date,'dd-mm-rrrr'),
+                                    :province,
+                                    :amount
+                                        )
+                                    `,
+                                {
+                                    replacements: {
+                                        date: date,
+                                        province: province,
+                                        amount: amount
+                                    },
+                                    type: sequelize.QueryTypes.INSERT,
+                                }
+                            );
+
+                            console.log("check ne", result);
+                        };
+                        res.send({ data: { sussess: true } })
+
+                    }
+
+                } catch (error) {
+                    throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+                }
+            }
+        }
+    }
+
+     async createManualListCloud(req, res) {
+        const result = validationResult(req);
+        if (result.isEmpty()) {
+            var dateString = req.body.date;
+            const kpiList = req.body.kpiList;
+            if (kpiList && kpiList.length > 0) {
+                try {
+                    console.log("kpiList", kpiList);
+                    for (const object of kpiList) {
+                        let info = {
+                            amount: object.amount,
+                            date: object.date,
+                            province: object.province
+
+                        }
+
+                        const existingKpi = await sequelize.query(
+                            `SELECT * THIDUA_IOT_30062025 WHERE date = :date
+                                and province_code = :province
+                                `,
+                            {
+                                replacements: { data: date, province: info.province },
+                                type: sequelize.QueryTypes.SELECT,
+                            }
+                        );
+                        if (existingKpi.length > 0) {
+                            await sequelize.query(
+                                `delete from THIDUA_IOT_30062025 
+                                        WHERE  date = :date
+                                    and province_code = :province
+                                        `,
+                                {
+                                    replacements: {
+                                        date: date,
+                                        province: province,
+                                    },
+                                    type: sequelize.QueryTypes.DELETE,
+                                }
+                            );
+                            await sequelize.query(
+                                `insert into  THIDUA_IOT_30062025 
+                                (date, province, amount)
+                                values
+                                (
+                                to_date(:date,'dd-mm-rrrr'),
+                                :province,
+                                :amount
+                                    )
+                                `,
+                                {
+                                    replacements: {
+                                        date: date,
+                                        province: province,
+                                        amount: amount
+                                    },
+                                    type: sequelize.QueryTypes.INSERT,
+                                }
+                            );
+
+                            console.log("check ne", result);
+
+                        } else {
+
+                            await sequelize.query(
+                                `insert into  THIDUA_IOT_30062025 
+                                    (date, province, amount)
+                                    values
+                                    (
+                                    to_date(:date,'dd-mm-rrrr'),
+                                    :province,
+                                    :amount
+                                        )
+                                    `,
+                                {
+                                    replacements: {
+                                        date: date,
+                                        province: province,
+                                        amount: amount
+                                    },
+                                    type: sequelize.QueryTypes.INSERT,
+                                }
+                            );
+
+                            console.log("check ne", result);
+                        };
+                        res.send({ data: { sussess: true } })
+
+                    }
+
+                } catch (error) {
+                    throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+                }
+            }
+        }
+    }
 }
+
 module.exports = new DashboardThiduaController();
