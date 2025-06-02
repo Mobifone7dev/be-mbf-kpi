@@ -79,7 +79,7 @@ class DashboardThiduaController {
                     and ACTIVE_DATE < to_date('01-07-2025', 'dd-mm-yyyy')
             )
         ), GROUPED_DATA AS (
-            select PROVINCE_PT, ACTIVE_DATE, sum(VALUE_NUMBER) DOANH_THU
+            select PROVINCE_PT, ACTIVE_DATE, sum(VALUE_NUMBER) DT
             from (
                 select t1.*, TEN_CHUONG_TRINH, NOI_DUNG, KEY, VALUE_NUMBER
                 from db01_owner.TH_TB_PTM_KPI_2025 t1
@@ -91,7 +91,7 @@ class DashboardThiduaController {
             )    
             group by PROVINCE_PT, ACTIVE_DATE
         )
-        select t1.*, DOANH_THU from DATE_PROVINCE_LIST t1
+        select t1.*, DT from DATE_PROVINCE_LIST t1
         left join GROUPED_DATA t2 ON (t2.PROVINCE_PT = t1.PROVINCE_PT and t2.ACTIVE_DATE = t1.ACTIVE_DATE)
         ORDER BY t1.ACTIVE_DATE, t1.PROVINCE_PT`;
         sequelize.query(query, {
