@@ -108,7 +108,10 @@ class DashboardThiduaController {
     }
 
     getDoanhthuCloud(req, res) {
-        const query = `select * from THIDUA_CLOUD_30062025`;
+        const query = `select province, issue_date, amount   from THIDUA_CLOUD_30062025
+            where issue_date >=  to_date('01/06/2025','dd/mm/rrrr')
+            and issue_date <  to_date('01/07/2025','dd/mm/rrrr')
+            order by  province, issue_date `;
         sequelize.query(query, {
             replacements: {},
             type: sequelize.QueryTypes.SELECT
@@ -123,7 +126,10 @@ class DashboardThiduaController {
     }
 
     getDoanhthuIOT(req, res) {
-        const query = `select * from THIDUA_IOT_30062025`;
+        const query = `select province, issue_date, amount   from THIDUA_IOT_30062025
+            where issue_date >=  to_date('01/06/2025','dd/mm/rrrr')
+            and issue_date <  to_date('01/07/2025','dd/mm/rrrr')
+            order by  province, issue_date  `;
         sequelize.query(query, {
             replacements: {},
             type: sequelize.QueryTypes.SELECT
