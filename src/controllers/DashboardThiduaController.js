@@ -147,7 +147,7 @@ class DashboardThiduaController {
         const date = req.query.date;
         if (date) {
             const query = `select province, issue_date, amount   from THIDUA_IOT_30062025
-            where issue_date >=  to_date(':date','dd/mm/rrrr')
+            where issue_date =  to_date(:date,'dd/mm/rrrr')
             order by  issue_date, province  `;
             sequelize.query(query, {
                 replacements: { date: date },
@@ -170,7 +170,7 @@ class DashboardThiduaController {
         const date = req.query.date;
         if (date) {
             const query = `select province, issue_date, amount   from THIDUA_CLOUD_30062025
-            where issue_date >=  to_date(':date','dd/mm/rrrr')
+            where issue_date = to_date(:date,'dd/mm/rrrr')
             order by  issue_date, province  `;
             sequelize.query(query, {
                 replacements: { date: date },
