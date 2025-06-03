@@ -180,7 +180,7 @@ class DashboardThiduaController {
                         }
 
                         const existingKpi = await sequelize.query(
-                            `SELECT * THIDUA_IOT_30062025 WHERE date = :date
+                            `SELECT * THIDUA_IOT_30062025 WHERE date = to_date(:date,'dd-mm-rrrr')
                                 and province_code = :province
                                 `,
                             {
@@ -188,10 +188,11 @@ class DashboardThiduaController {
                                 type: sequelize.QueryTypes.SELECT,
                             }
                         );
+                        console.log("existingKpi", existingKpi);
                         if (existingKpi.length > 0) {
                             await sequelize.query(
                                 `delete from THIDUA_IOT_30062025 
-                                        WHERE  date = :date
+                                        WHERE  date = to_date(:date,'dd-mm-rrrr')
                                     and province_code = :province
                                         `,
                                 {
@@ -246,11 +247,10 @@ class DashboardThiduaController {
                                 }
                             );
 
-                            console.log("check ne", result);
                         };
-                        res.send({ data: { sussess: true } })
 
                     }
+                    res.send({ data: { sussess: true } })
 
                 } catch (error) {
                     throw new Error(`Có lỗi xảy ra:  ${error}`)
@@ -263,45 +263,44 @@ class DashboardThiduaController {
     async createManualListCloud(req, res) {
         const result = validationResult(req);
         if (result.isEmpty()) {
-            var dateString = req.body.date;
             const kpiList = req.body.kpiList;
             if (kpiList && kpiList.length > 0) {
                 try {
                     console.log("kpiList", kpiList);
                     for (const object of kpiList) {
                         let info = {
-                            amount: object.amount,
+                            amount: object.amount ?? 0,
                             date: object.date,
                             province: object.province
 
                         }
 
                         const existingKpi = await sequelize.query(
-                            `SELECT * THIDUA_IOT_30062025 WHERE date = :date
-                                and province_code = :province
+                            `SELECT * from THIDUA_IOT_30062025 WHERE issue_date =  to_date(:date,'dd-mm-rrrr')
+                                and province = :province
                                 `,
                             {
-                                replacements: { data: date, province: info.province },
+                                replacements: { date: info.date, province: info.province },
                                 type: sequelize.QueryTypes.SELECT,
                             }
                         );
                         if (existingKpi.length > 0) {
                             await sequelize.query(
                                 `delete from THIDUA_IOT_30062025 
-                                        WHERE  date = :date
-                                    and province_code = :province
+                                        WHERE  issue_date = to_date(:date,'dd-mm-rrrr')
+                                    and province = :province
                                         `,
                                 {
                                     replacements: {
-                                        date: date,
-                                        province: province,
+                                        date: info.date,
+                                        province: info.province,
                                     },
                                     type: sequelize.QueryTypes.DELETE,
                                 }
                             );
                             await sequelize.query(
                                 `insert into  THIDUA_IOT_30062025 
-                                (date, province, amount)
+                                (issue_date, province, amount)
                                 values
                                 (
                                 to_date(:date,'dd-mm-rrrr'),
@@ -311,9 +310,9 @@ class DashboardThiduaController {
                                 `,
                                 {
                                     replacements: {
-                                        date: date,
-                                        province: province,
-                                        amount: amount
+                                        date: info.date,
+                                        province: info.province,
+                                        amount: info.amount
                                     },
                                     type: sequelize.QueryTypes.INSERT,
                                 }
@@ -325,7 +324,7 @@ class DashboardThiduaController {
 
                             await sequelize.query(
                                 `insert into  THIDUA_IOT_30062025 
-                                    (date, province, amount)
+                                    (issue_date, province, amount)
                                     values
                                     (
                                     to_date(:date,'dd-mm-rrrr'),
@@ -335,20 +334,17 @@ class DashboardThiduaController {
                                     `,
                                 {
                                     replacements: {
-                                        date: date,
-                                        province: province,
-                                        amount: amount
+                                        date: info.date,
+                                        province: info.province,
+                                        amount: info.amount
                                     },
                                     type: sequelize.QueryTypes.INSERT,
                                 }
                             );
 
-                            console.log("check ne", result);
                         };
-                        res.send({ data: { sussess: true } })
-
                     }
-
+                    res.send({ data: { sussess: true } })
                 } catch (error) {
                     throw new Error(`Có lỗi xảy ra:  ${error}`)
 
