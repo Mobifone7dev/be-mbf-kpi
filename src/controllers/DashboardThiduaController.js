@@ -129,7 +129,7 @@ class DashboardThiduaController {
         const query = `select province, issue_date, amount   from THIDUA_IOT_30062025
             where issue_date >=  to_date('01/06/2025','dd/mm/rrrr')
             and issue_date <  to_date('01/07/2025','dd/mm/rrrr')
-            order by  province, issue_date  `;
+            order by  issue_date, province  `;
         sequelize.query(query, {
             replacements: {},
             type: sequelize.QueryTypes.SELECT
@@ -141,6 +141,52 @@ class DashboardThiduaController {
                 console.error("Error fetching Thidua  data:", err);
                 res.status(500).json({ error: "Internal Server Error" });
             });
+    }
+
+    getDoanhthuIOTDetail(req, res) {
+        const date = req.query.date;
+        if (date) {
+            const query = `select province, issue_date, amount   from THIDUA_IOT_30062025
+            where issue_date >=  to_date(':date','dd/mm/rrrr')
+            order by  issue_date, province  `;
+            sequelize.query(query, {
+                replacements: { date: date },
+                type: sequelize.QueryTypes.SELECT
+            })
+                .then(data => {
+                    res.json({ data });
+                })
+                .catch(err => {
+                    console.error("Error fetching Thidua  data:", err);
+                    res.status(500).json({ error: "Internal Server Error" });
+                });
+        } else {
+            res.status(500).json({ error: "Thiếu thông tin ngày" });
+        }
+
+    }
+
+    getDoanhthuCloudDetail(req, res) {
+        const date = req.query.date;
+        if (date) {
+            const query = `select province, issue_date, amount   from THIDUA_CLOUD_30062025
+            where issue_date >=  to_date(':date','dd/mm/rrrr')
+            order by  issue_date, province  `;
+            sequelize.query(query, {
+                replacements: { date: date },
+                type: sequelize.QueryTypes.SELECT
+            })
+                .then(data => {
+                    res.json({ data });
+                })
+                .catch(err => {
+                    console.error("Error fetching Thidua  data:", err);
+                    res.status(500).json({ error: "Internal Server Error" });
+                });
+        } else {
+            res.status(500).json({ error: "Thiếu thông tin ngày" });
+        }
+
     }
     getSoluongPTMThiduaM2M(req, res) {
         const query = `select count(isdn) quantity, province_pt, active_date
@@ -170,103 +216,7 @@ class DashboardThiduaController {
     }
 
     async createManualListIOT(req, res) {
-        const result = validationResult(req);
-        if (result.isEmpty()) {
-            var dateString = req.body.date;
-            const kpiList = req.body.kpiList;
-            if (kpiList && kpiList.length > 0) {
-                try {
-                    console.log("kpiList", kpiList);
-                    for (const object of kpiList) {
-                        let info = {
-                            amount: object.amount,
-                            date: object.date,
-                            province: object.province
 
-                        }
-
-                        const existingKpi = await sequelize.query(
-                            `SELECT * THIDUA_IOT_30062025 WHERE date = to_date(:date,'dd-mm-rrrr')
-                                and province_code = :province
-                                `,
-                            {
-                                replacements: { data: date, province: info.province },
-                                type: sequelize.QueryTypes.SELECT,
-                            }
-                        );
-                        console.log("existingKpi", existingKpi);
-                        if (existingKpi.length > 0) {
-                            await sequelize.query(
-                                `delete from THIDUA_IOT_30062025 
-                                        WHERE  date = to_date(:date,'dd-mm-rrrr')
-                                    and province_code = :province
-                                        `,
-                                {
-                                    replacements: {
-                                        date: date,
-                                        province: province,
-                                    },
-                                    type: sequelize.QueryTypes.DELETE,
-                                }
-                            );
-                            await sequelize.query(
-                                `insert into  THIDUA_IOT_30062025 
-                                (date, province, amount)
-                                values
-                                (
-                                to_date(:date,'dd-mm-rrrr'),
-                                :province,
-                                :amount
-                                    )
-                                `,
-                                {
-                                    replacements: {
-                                        date: date,
-                                        province: province,
-                                        amount: amount
-                                    },
-                                    type: sequelize.QueryTypes.INSERT,
-                                }
-                            );
-
-                            console.log("check ne", result);
-
-                        } else {
-
-                            await sequelize.query(
-                                `insert into  THIDUA_IOT_30062025 
-                                    (date, province, amount)
-                                    values
-                                    (
-                                    to_date(:date,'dd-mm-rrrr'),
-                                    :province,
-                                    :amount
-                                        )
-                                    `,
-                                {
-                                    replacements: {
-                                        date: date,
-                                        province: province,
-                                        amount: amount
-                                    },
-                                    type: sequelize.QueryTypes.INSERT,
-                                }
-                            );
-
-                        };
-
-                    }
-                    res.send({ data: { sussess: true } })
-
-                } catch (error) {
-                    throw new Error(`Có lỗi xảy ra:  ${error}`)
-
-                }
-            }
-        }
-    }
-
-    async createManualListCloud(req, res) {
         const result = validationResult(req);
         if (result.isEmpty()) {
             const kpiList = req.body.kpiList;
@@ -290,6 +240,8 @@ class DashboardThiduaController {
                                 type: sequelize.QueryTypes.SELECT,
                             }
                         );
+
+                        console.log("existingKpi", existingKpi)
                         if (existingKpi.length > 0) {
                             await sequelize.query(
                                 `delete from THIDUA_IOT_30062025 
@@ -330,6 +282,101 @@ class DashboardThiduaController {
 
                             await sequelize.query(
                                 `insert into  THIDUA_IOT_30062025 
+                                    (issue_date, province, amount)
+                                    values
+                                    (
+                                    to_date(:date,'dd-mm-rrrr'),
+                                    :province,
+                                    :amount
+                                        )
+                                    `,
+                                {
+                                    replacements: {
+                                        date: info.date,
+                                        province: info.province,
+                                        amount: info.amount
+                                    },
+                                    type: sequelize.QueryTypes.INSERT,
+                                }
+                            );
+
+                        };
+                    }
+                    res.send({ data: { sussess: true } })
+                } catch (error) {
+                    throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+                }
+            }
+        }
+    }
+
+    async createManualListCloud(req, res) {
+        const result = validationResult(req);
+        if (result.isEmpty()) {
+            const kpiList = req.body.kpiList;
+            if (kpiList && kpiList.length > 0) {
+                try {
+                    console.log("kpiList", kpiList);
+                    for (const object of kpiList) {
+                        let info = {
+                            amount: object.amount ?? 0,
+                            date: object.date,
+                            province: object.province
+
+                        }
+
+                        const existingKpi = await sequelize.query(
+                            `SELECT * from THIDUA_CLOUD_30062025 WHERE issue_date =  to_date(:date,'dd-mm-rrrr')
+                                and province = :province
+                                `,
+                            {
+                                replacements: { date: info.date, province: info.province },
+                                type: sequelize.QueryTypes.SELECT,
+                            }
+                        );
+
+                        console.log("existingKpi", existingKpi)
+                        if (existingKpi.length > 0) {
+                            await sequelize.query(
+                                `delete from THIDUA_CLOUD_30062025 
+                                        WHERE  issue_date = to_date(:date,'dd-mm-rrrr')
+                                    and province = :province
+                                        `,
+                                {
+                                    replacements: {
+                                        date: info.date,
+                                        province: info.province,
+                                    },
+                                    type: sequelize.QueryTypes.DELETE,
+                                }
+                            );
+                            await sequelize.query(
+                                `insert into  THIDUA_CLOUD_30062025 
+                                (issue_date, province, amount)
+                                values
+                                (
+                                to_date(:date,'dd-mm-rrrr'),
+                                :province,
+                                :amount
+                                    )
+                                `,
+                                {
+                                    replacements: {
+                                        date: info.date,
+                                        province: info.province,
+                                        amount: info.amount
+                                    },
+                                    type: sequelize.QueryTypes.INSERT,
+                                }
+                            );
+
+                            console.log("check ne", result);
+
+                        } else {
+
+                            await sequelize.query(
+                                `insert into  THIDUA_CLOUD_30062025 
                                     (issue_date, province, amount)
                                     values
                                     (
