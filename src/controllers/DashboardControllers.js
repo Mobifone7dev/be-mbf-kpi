@@ -407,10 +407,10 @@ class DashboardController {
     const formattedMonth = moment(month, "DD-MM-YYYY").format("MM/YYYY");
 
     // Xây dựng câu lệnh SQL tùy vào điều kiện có provincePt hay không
-    let sql = `
+let sql = `
         SELECT to_char(MONTH, 'dd-mm-yyyy') MONTH, to_char(FILE_DATE, 'dd-mm-yyyy') FILE_DATE, LOAITB, ISDN, SUB_ID, to_char(ACTIVE_DATE, 'dd-mm-yyyy') ACTIVE_DATE, 
 STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DISTRICT_PT, SHOP_CODE_PT, NV_PT, LOAI_HINH_TB, 
-    KPI_PTM_HTS, KPI_PTM_TBTS_THOAI, KPI_PTM_NDS, KPI_PTM_M2M, KPI_PTM_SAYMEE, GOI_CUOC_KPI, to_char(NGAY_DKY_GOI_KPI, 'dd-mm-yyyy') NGAY_DKY_GOI_KPI
+    KPI_PTM_HTS, KPI_PTM_TBTS_THOAI, KPI_PTM_NDS, KPI_PTM_M2M, KPI_PTM_SAYMEE, GOI_CUOC_KPI, to_char(NGAY_DKY_GOI_KPI, 'dd-mm-yyyy') NGAY_DKY_GOI_KPI, GIA_GOI_CUOC_KPI, NEN_TANG_NDS, VASP_REG_CODE 
         FROM db01_owner.th_tb_ptm_kpi_2025
         WHERE TO_CHAR(MONTH, 'MM/YYYY') = '${formattedMonth}'
           AND ${kpiType} = '1'
