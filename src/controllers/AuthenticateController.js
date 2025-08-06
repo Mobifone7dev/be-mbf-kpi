@@ -9,6 +9,7 @@ class Authenticate_Controller {
     const username = req.body.username;
     const password = req.body.password;
     const user = { name: username };
+    console.log("process.env.LDAP_URI", process.env.LDAP_URI);
     if (username && password) {
       var client = ldap.createClient({
         url: process.env.LDAP_URI,

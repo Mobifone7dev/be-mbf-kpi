@@ -2,6 +2,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const dashboardRouter = require("./DashBoard");
 const dashboardThiduaRouter = require("./DashBoardThidua");
+const dashboardThiduaT08Router = require("./DashBoardThiduaT08");
 const authenticateRouter = require("./Authenticate");
 const userRoleRouter = require("./UserRole");
 
@@ -14,6 +15,8 @@ function route(app) {
   app.use("/dashboard", authenticateToken, dashboardRouter);
   app.use("/user-role", authenticateToken, userRoleRouter);
   app.use("/dashboard-thidua", dashboardThiduaRouter);
+  app.use("/dashboard-thidua-t08", dashboardThiduaT08Router);
+
 
 }
 function authenticateToken(req, res, next) {
