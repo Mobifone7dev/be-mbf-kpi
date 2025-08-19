@@ -5,7 +5,7 @@ const controller = require("../controllers/DashboardThiduaT08Controller");
 router.get("/dthu-thidua-ltt", controller.getDoanhthuLTT);
 router.get("/sl-thidua-ltt", controller.getSoLuongLTT);
 router.get("/dthu-thidua-camera", controller.getDoanhthuCamera);
-router.get("/dthu-thidua-camera-sl", controller.getSoLuongCamera);
+router.get("/sl-thidua-camera", controller.getSoLuongCamera);
 router.get("/dthu-thidua-camera-detail", controller.getDoanhthuCameraDetail);
 router.get("/sl-thidua-camera-detail", controller.getSoLuongCameraDetail);
 router.get("/dthu-thidua-ltt-detail", controller.getDoanhthuLTTDetail);
