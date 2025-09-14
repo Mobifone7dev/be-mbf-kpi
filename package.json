@@ -15,6 +15,7 @@
     "express-validator": "^7.2.0",
     "helmet": "^8.0.0",
     "hsts": "^2.2.0",
+    "https-proxy-agent": "^5.0.1",
     "jsonwebtoken": "^9.0.2",
     "ldapjs": "^3.0.7",
     "moment": "^2.29.4",

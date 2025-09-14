@@ -1,6 +1,7 @@
 
 
 const fs = require("fs");
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -10,8 +11,19 @@ const hsts = require('hsts')
 const helmet = require('helmet');
 const app = express();
 const PORT = 8104;
-
-require('dotenv').config();
+const cspConfig = {
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "ajax.googleapis.com"],
+    styleSrc: ["'self'", "maxcdn.bootstrapcdn.com"],
+    imgSrc: ["'self'", "tracuu7.mobifone.vn"],
+    connectSrc: ["'self'", "tracuu7.mobifone.vn"],
+    fontSrc: ["'self'", "fonts.gstatic.com"],
+    objectSrc: ["'none'"],
+    upgradeInsecureRequests: [],
+  },
+};
+app.use(helmet.contentSecurityPolicy(cspConfig));
 app.use(cors());
 app.use(morgan("combined"));
 app.use(
@@ -54,22 +66,6 @@ app.use(function (req, res, next) {
   }
   next();
 })
-
-const cspConfig = {
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "ajax.googleapis.com"],
-    styleSrc: ["'self'", "maxcdn.bootstrapcdn.com"],
-    imgSrc: ["'self'", "tracuu7.mobifone.vn"],
-    connectSrc: ["'self'", "tracuu7.mobifone.vn"],
-    fontSrc: ["'self'", "fonts.gstatic.com"],
-    objectSrc: ["'none'"],
-    upgradeInsecureRequests: [],
-  },
-};
-app.use(helmet.contentSecurityPolicy(cspConfig));
-
-
 
 
 https.createServer({
