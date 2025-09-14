@@ -14,7 +14,7 @@ const PORT = 8104;
 const cspConfig = {
   directives: {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "ajax.googleapis.com"],
+    scriptSrc: ["'self'", "google.com", "ajax.googleapis.com"],
     styleSrc: ["'self'", "maxcdn.bootstrapcdn.com"],
     imgSrc: ["'self'", "tracuu7.mobifone.vn"],
     connectSrc: ["'self'", "tracuu7.mobifone.vn"],
