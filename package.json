@@ -21,6 +21,7 @@
     "moment": "^2.29.4",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "node-fetch": "^3.3.2",
     "oracledb": "^5.5.0",
     "scss": "^0.2.4",
     "sequelize": "^6.37.5",
