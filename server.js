@@ -24,6 +24,13 @@ const cspConfig = {
   },
 };
 app.use(helmet.contentSecurityPolicy(cspConfig));
+app.use(
+  helmet.hsts({
+    maxAge: 31536000,        // 1 năm
+    includeSubDomains: true, // áp dụng cả subdomain
+    preload: true,           // cho preload list
+  })
+);
 app.use(cors());
 app.use(morgan("combined"));
 app.use(
@@ -34,9 +41,7 @@ app.use(
 app.use(express.json());
 const route = require("./src/routes");
 route(app);
-app.use(hsts({
-  maxAge: 15552000  // 180 days in seconds
-}))
+
 app.use("/public", express.static(path.join(__dirname, "public")));
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
