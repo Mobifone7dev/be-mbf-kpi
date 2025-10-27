@@ -45,8 +45,8 @@ route(app);
 app.use("/public", express.static(path.join(__dirname, "public")));
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-var certificate = fs.readFileSync('/usr/local/ssl/certificate/tracuu7/cert_tracuu7_161024.crt');
-var privateKey = fs.readFileSync('/usr/local/ssl/certificate/tracuu7/private_tracuu7.key')
+var certificate = fs.readFileSync('/usr/local/ssl/certificate/tracuu7/cert_chonso7_271025.crt');
+var privateKey = fs.readFileSync('/usr/local/ssl/certificate/tracuu7/chonso7_private_key_271025.key')
 app.use((req, res, next) => {
   const allowedOrigins =
     ['https://tracuu7.mobifone.vn',
