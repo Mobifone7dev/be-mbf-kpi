@@ -55,6 +55,7 @@ class DashboardController {
     let sql;
     if (startOfMonth) {
       sql = `select * from db01_owner.chitieu_kpi_dla where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+      console.log("chekc ne", sql)
     }
     if (monthString && startOfMonth) {
       DbConnection.getConnected(sql, {}, function (data) {
