@@ -33,8 +33,29 @@ class DashboardController {
 
     }
 
+    if (monthString && startOfMonth) {
+      DbConnection.getConnected(sql, {}, function (data) {
 
+        if (data) {
+          data.map((item, index) => { });
+          res.status(200).json({ result: data }); // This runs as well.
+        }
+      });
+    } else {
+      res.status(401).json({ error: "có lỗi xảy ra" }); // This runs as well.
 
+    }
+
+  }
+
+  async getDashBoardPlanKpiDLA(req, res) {
+    let monthString = req.query.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    let sql;
+    if (startOfMonth) {
+      sql = `select * from db01_owner.chitieu_kpi_dla where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+    }
     if (monthString && startOfMonth) {
       DbConnection.getConnected(sql, {}, function (data) {
 
@@ -407,7 +428,7 @@ class DashboardController {
     const formattedMonth = moment(month, "DD-MM-YYYY").format("MM/YYYY");
 
     // Xây dựng câu lệnh SQL tùy vào điều kiện có provincePt hay không
-let sql = `
+    let sql = `
         SELECT to_char(MONTH, 'dd-mm-yyyy') MONTH, to_char(FILE_DATE, 'dd-mm-yyyy') FILE_DATE, LOAITB, ISDN, SUB_ID, to_char(ACTIVE_DATE, 'dd-mm-yyyy') ACTIVE_DATE, 
 STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DISTRICT_PT, SHOP_CODE_PT, NV_PT, LOAI_HINH_TB, 
     KPI_PTM_HTS, KPI_PTM_TBTS_THOAI, KPI_PTM_NDS, KPI_PTM_M2M, KPI_PTM_SAYMEE, GOI_CUOC_KPI, to_char(NGAY_DKY_GOI_KPI, 'dd-mm-yyyy') NGAY_DKY_GOI_KPI, GIA_GOI_CUOC_KPI, NEN_TANG_NDS, VASP_REG_CODE 
@@ -480,8 +501,8 @@ const returnLastDate = (nameKpi, object) => {
       return object.dateUpdateTYLEGDC2C ? new Date(object.dateUpdateTYLEGDC2C) : new Date();
     case 'TI_LE_DN_SU_DUNG_GP_MBF':
       return object.dateUpdateGpMbf ? new Date(object.dateUpdateGpMbf) : new Date();
-      case 'SL_HD_GPS_KHDN':
-        return object.dateUpdate_SL_HD_GPS_KHDN ? new Date(object.dateUpdate_SL_HD_GPS_KHDN) : new Date();
+    case 'SL_HD_GPS_KHDN':
+      return object.dateUpdate_SL_HD_GPS_KHDN ? new Date(object.dateUpdate_SL_HD_GPS_KHDN) : new Date();
     default: return new Date();
 
   }
