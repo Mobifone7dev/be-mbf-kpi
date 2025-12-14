@@ -12,7 +12,8 @@ const { query, validationResult } = require("express-validator");
 
 class DashboardController {
   index(req, res) {
-    res.send({ result: "hello wolrd" });
+
+    res.send({ result: "hello wolrd " + req.path });
 
   }
   async getDashBoardPlanKpi(req, res) {
