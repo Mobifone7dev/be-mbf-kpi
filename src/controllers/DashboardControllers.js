@@ -464,11 +464,11 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
     var monthString = req.query.month;
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    try {
 
-    if (monthString && startOfMonth) {
-      let sql;
+      if (monthString && startOfMonth) {
 
-      sql = `
+        let sql = `
           SELECT v1.*,
        NVL(v1.DLA_T01,0) + NVL(v1.DLA_T02,0) + NVL(v1.DLA_T03,0)
      + NVL(v1.DLA_T04,0) + NVL(v1.DLA_T05,0) + NVL(v1.DLA_T06,0)
@@ -507,20 +507,23 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
                   )
               )
           ) v1
-        
       
         `;
 
+        DbConnection.getConnected(sql, {}, function (result) {
+          if (result) {
+            res.send({ result: result });
+          }
+        });
+      } else {
+        res.send({ error: "Có lỗi xảy ra" });
+      }
+    } catch (error) {
+      res.send({ error: "Có lỗi xảy ra", error });
 
-
-      DbConnection.getConnected(sql, {}, function (result) {
-        if (result) {
-          res.send({ result: result });
-        }
-      });
-    } else {
-      res.send({ error: "Có lỗi xảy ra" });
     }
+
+
   }
   async createManualListKpiDLA(req, res) {
     const result = validationResult(req);
