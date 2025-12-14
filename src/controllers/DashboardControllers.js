@@ -464,6 +464,8 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
     var monthString = req.query.month;
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    res.send({ result: startOfMonth });
+
     try {
 
       if (monthString && startOfMonth) {
