@@ -458,6 +458,181 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
   show(req, res) {
     res.send("detail");
   }
+
+  getDashBoardExecKpiDLA(req, res) {
+    var monthString = req.query.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+
+    if (monthString && startOfMonth) {
+      let sql;
+
+      sql = `
+          SELECT v1.*,
+       NVL(v1.DLA_T01,0) + NVL(v1.DLA_T02,0) + NVL(v1.DLA_T03,0)
+     + NVL(v1.DLA_T04,0) + NVL(v1.DLA_T05,0) + NVL(v1.DLA_T06,0)
+     + NVL(v1.DLA_T07,0) + NVL(v1.DLA_T08,0) + NVL(v1.DLA_T09,0)
+     + NVL(v1.DLA_T10,0) + NVL(v1.DLA_T11,0) + NVL(v1.DLA_T12,0)
+     + NVL(v1.DLA_T13,0)
+     + NVL(v1.DLA_D01,0) + NVL(v1.DLA_D02,0) + NVL(v1.DLA_D03,0)
+     + NVL(v1.DLA_D04,0) + NVL(v1.DLA_D05,0) + NVL(v1.DLA_D06,0)
+     + NVL(v1.TTKDVT,0)  + NVL(v1.TTKDGPS,0) AS DLA
+          FROM (
+              SELECT *
+              FROM (
+                  SELECT ten_chi_tieu,
+                        area,
+                        SUM(thuc_hien) th,
+                        MAX(last_date) last_date
+                  FROM db01_owner.thuc_hien_kpi_dla
+                  WHERE thang = to_date('${startOfMonth}','dd/mm/rrrr')
+                  GROUP BY ten_chi_tieu, area
+              )
+              PIVOT (
+                  SUM(th)
+                  FOR area IN (
+                      'DLA_T01' DLA_T01, 'DLA_T02' DLA_T02,
+                      'DLA_T03' DLA_T03, 'DLA_T04' DLA_T04,
+                      'DLA_T05' DLA_T05, 'DLA_T06' DLA_T06,
+                      'DLA_T07' DLA_T07, 'DLA_T08' DLA_T08,
+                      'DLA_T09' DLA_T09, 'DLA_T10' DLA_T10,
+                      'DLA_T11' DLA_T11, 'DLA_T12' DLA_T12,
+                      'DLA_T13' DLA_T13,
+                      'DLA_D01' DLA_D01, 'DLA_D02' DLA_D02,
+                      'DLA_D03' DLA_D03, 'DLA_D04' DLA_D04,
+                      'DLA_D05' DLA_D05, 'DLA_D06' DLA_D06,
+                      'TTKDVT'  TTKDVT,
+                      'TTKDGPS' TTKDGPS
+                  )
+              )
+          ) v1
+        
+      
+        `;
+
+
+
+      DbConnection.getConnected(sql, {}, function (result) {
+        if (result) {
+          res.send({ result: result });
+        }
+      });
+    } else {
+      res.send({ error: "Có lỗi xảy ra" });
+    }
+  }
+  async createManualListKpiDLA(req, res) {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      var monthString = req.body.month;
+      const myDate = moment(monthString, "DD-MM-YYYY");
+      const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+      const kpiList = req.body.kpiList;
+      if (kpiList && kpiList.length > 0) {
+        try {
+          console.log("kpiList", kpiList);
+          for (const object of kpiList) {
+            let info = {
+              nameKpi: object.id,
+              kpi: object.value,
+              month: startOfMonth,
+              area: object.area
+
+            }
+            let lastDate = new Date();
+            lastDate = returnLastDate(info.nameKpi, req.body)
+
+
+            const existingKpi = await sequelize.query(
+              `SELECT * FROM db01_owner.thuc_hien_kpi_dla WHERE ten_chi_tieu = :nameKpi
+               and thang = to_date(:month,'dd-mm-rrrr')
+               and area = :area
+               `,
+              {
+                replacements: { nameKpi: info.nameKpi, month: info.month, area: info.area },
+                type: sequelize.QueryTypes.SELECT,
+              }
+            );
+            if (existingKpi.length > 0) {
+              await sequelize.query(
+                `delete from db01_owner.thuc_hien_kpi_dla 
+                WHERE ten_chi_tieu = :nameKpi and thang = to_date(:month,'dd-mm-rrrr')
+                and area =:area
+                `,
+                {
+                  replacements: {
+                    nameKpi: info.nameKpi,
+                    month: info.month,
+                    area: info.area,
+                  },
+                  type: sequelize.QueryTypes.DELETE,
+                }
+              );
+              await sequelize.query(
+                `insert into  db01_owner.thuc_hien_kpi_2025 
+                (ten_chi_tieu, thang, last_date, area,thuc_hien)
+                values
+                (
+                :nameKpi,
+                 to_date(:month,'dd-mm-rrrr'),
+                :lastDate,
+                :area,
+                :kpi
+                )
+                  `,
+                {
+                  replacements: {
+                    nameKpi: info.nameKpi,
+                    month: info.month,
+                    lastDate: lastDate,
+                    area: info.area,
+                    kpi: info.kpi
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
+              console.log("check result", result);
+
+            } else {
+              const result = await sequelize.query(
+                `insert into  db01_owner.thuc_hien_kpi_2025 
+              (ten_chi_tieu, thang, last_date, area,thuc_hien)
+              values
+              (
+              :nameKpi,
+               to_date(:month,'dd-mm-rrrr'),
+              :lastDate,
+              :area,
+              :kpi
+              )
+                `,
+                {
+                  replacements: {
+                    nameKpi: info.nameKpi,
+                    month: info.month,
+                    lastDate: new Date(),
+                    area: info.area,
+                    kpi: info.kpi,
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
+            }
+            console.log("check result", result);
+          };
+          res.send({ data: { sussess: true } })
+        } catch (error) {
+          throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+
+        }
+
+      }
+
+    }
+  }
 }
 const returnOrderNumber = (nameKpi) => {
   switch (nameKpi) {
@@ -508,4 +683,11 @@ const returnLastDate = (nameKpi, object) => {
 
   }
 }
+
+
+
+
+
+
+
 module.exports = new DashboardController();
