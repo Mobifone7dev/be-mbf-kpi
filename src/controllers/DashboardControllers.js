@@ -507,12 +507,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
               )
           ) v1 `;
       DbConnection.getConnected(sql, {}, function (result) {
-        if (result) {
           res.send({ result: result });
-        } else {
-          res.send({ result: "test"  });
-
-        }
       });
     } else {
       res.send({ error: "Có lỗi xảy ra" });
