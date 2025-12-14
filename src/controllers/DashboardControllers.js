@@ -470,7 +470,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       if (monthString && startOfMonth) {
 
         let sql = `
-          SELECT v1.*,
+      SELECT v1.*,
        NVL(v1.DLA_T01,0) + NVL(v1.DLA_T02,0) + NVL(v1.DLA_T03,0)
      + NVL(v1.DLA_T04,0) + NVL(v1.DLA_T05,0) + NVL(v1.DLA_T06,0)
      + NVL(v1.DLA_T07,0) + NVL(v1.DLA_T08,0) + NVL(v1.DLA_T09,0)
@@ -510,8 +510,6 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
           ) v1
       
         `;
-        res.send({ result: sql });
-
         DbConnection.getConnected(sql, {}, function (result) {
           if (result) {
             res.send({ result: result });
