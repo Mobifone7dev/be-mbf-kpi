@@ -10,7 +10,7 @@ router.post("/dashboard-create-manual-list-kpi", dashboardController.createManua
 router.post("/dashboard-create-manual-list-kpi-dla", dashboardController.createManualListKpiDLA);
 router.get("/dashboard-export-excel-exec-kpi", dashboardController.exportExcelExecKpi);
 router.get("/dashboard-search-employee-by-area", dashboardController.searcEmployeebyArea);
-router.get("/dashboard-search-employee-by_empcode", dashboardController.searcEmployeeByEmpcode);
+router.get("/dashboard-search-employee-by-empcode", dashboardController.searcEmployeeByEmpcode);
 
 router.use("/", dashboardController.index);
 
