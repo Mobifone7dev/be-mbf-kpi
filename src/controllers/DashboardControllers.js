@@ -638,11 +638,11 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       try {
 
         sequelize.query(
-          `select a.emp_code, a.emp_name, a.shop_code, b.shop_name, b.area_code, b.ward_code from db01_owner.v_employee a
-            inner join (select shop_code, shop_name, area_code, ward_code from db01_owner.map_shopcode_area_ward_new  )b
-            on a.shop_code = b.shop_code and a.status =1
-             where a.emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)       
-            and a.shop_code like 'DLA%'
+          `select emp_code, emp_name, shop_code from db01_owner.v_employee 
+            where emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)
+            and shop_code in 
+            (select shop_code from db01_owner.map_shopcode_area_ward_new where area_code =:area )
+            and status = '1'
             and  emp_code like :matchSearch
                       `,
           {
@@ -674,9 +674,11 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       try {
 
         sequelize.query(
-          `select emp_code, emp_name, shop_code from db01_owner.v_employee 
-            where emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)
-            and status = '1'
+          `select a.emp_code, a.emp_name, a.shop_code, b.shop_name, b.area_code, b.ward_code from db01_owner.v_employee a
+            inner join (select shop_code, shop_name, area_code, ward_code from db01_owner.map_shopcode_area_ward_new  )b
+            on a.shop_code = b.shop_code and a.status =1
+             where a.emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)       
+            and a.shop_code like 'DLA%'
             and  emp_code like :matchSearch
            `,
           {
