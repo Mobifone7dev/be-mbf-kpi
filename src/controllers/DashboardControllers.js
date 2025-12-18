@@ -637,19 +637,25 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
       try {
 
-        const existingKpi = await sequelize.query(
+        sequelize.query(
           `select emp_code, emp_name, shop_code from db01_owner.v_employee 
-where emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)
-and shop_code in 
-(select shop_code from db01_owner.map_shopcode_area_ward_new where area_code =:area )
-and status = '1'
-and  emp_code like :matchSearch
-           `,
+            where emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)
+            and shop_code in 
+            (select shop_code from db01_owner.map_shopcode_area_ward_new where area_code =:area )
+            and status = '1'
+            and  emp_code like :matchSearch
+                      `,
           {
-            replacements: { nameKpi: info.nameKpi, month: info.month, provinceCode: info.province },
+            replacements: { area: area, matchSearch: matchSearch },
             type: sequelize.QueryTypes.SELECT,
           }
-        );
+        ).then(data => {
+          res.json({ data });
+        })
+          .catch(err => {
+            console.error("Error fetching  data:", err);
+            res.status(500).json({ error: "Internal Server Error" });
+          });;
 
 
       } catch (error) {
@@ -660,7 +666,42 @@ and  emp_code like :matchSearch
       res.statu(400).send({ data: { error: 'thieu thong tin area code' } })
     }
   }
+  async searcEmployeeByEmpcode(req, res) {
+    const area = req.query.area;
+    const matchSearch = req.query.matchSearch;
+    if (area && matchSearch) {
+
+      try {
+
+        sequelize.query(
+          `select emp_code, emp_name, shop_code from db01_owner.v_employee 
+            where emp_code in (select staff_code from sale_owner.STAFF_WORK_DAY_0721_2)
+            and status = '1'
+            and  emp_code like :matchSearch
+           `,
+          {
+            replacements: { matchSearch: matchSearch },
+            type: sequelize.QueryTypes.SELECT,
+          }
+        ).then(data => {
+          res.json({ data });
+        })
+          .catch(err => {
+            console.error("Error fetching  data:", err);
+            res.status(500).json({ error: "Internal Server Error" });
+          });
+
+      } catch (error) {
+        throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+      }
+    } else {
+      res.statu(400).send({ data: { error: 'thieu thong tin area code' } })
+    }
+  }
 }
+
+
 const returnOrderNumber = (nameKpi) => {
   switch (nameKpi) {
     case 'DTHU_FIBER':
