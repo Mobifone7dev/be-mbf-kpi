@@ -667,9 +667,8 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
     }
   }
   async searcEmployeeByEmpcode(req, res) {
-    const area = req.query.area;
     const matchSearch = req.query.matchSearch;
-    if (area && matchSearch) {
+    if ( matchSearch) {
 
       try {
 
@@ -698,7 +697,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
       }
     } else {
-      res.status(400).send({ data: { error: 'thieu thong tin area code' } })
+      res.status(400).send({ data: { error: 'thieu thong tin matchSearch' } })
     }
   }
 }
