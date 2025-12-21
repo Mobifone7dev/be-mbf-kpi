@@ -533,44 +533,16 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
       let sql = `
        SELECT v1.*,
-          NVL(v1.DLA_T01,0) + NVL(v1.DLA_T02,0) + NVL(v1.DLA_T03,0)
-        + NVL(v1.DLA_T04,0) + NVL(v1.DLA_T05,0) + NVL(v1.DLA_T06,0)
-        + NVL(v1.DLA_T07,0) + NVL(v1.DLA_T08,0) + NVL(v1.DLA_T09,0)
-        + NVL(v1.DLA_T10,0) + NVL(v1.DLA_T11,0) + NVL(v1.DLA_T12,0)
-        + NVL(v1.DLA_T13,0)
-        + NVL(v1.DLA_D01,0) + NVL(v1.DLA_D02,0) + NVL(v1.DLA_D03,0)
-        + NVL(v1.DLA_D04,0) + NVL(v1.DLA_D05,0) + NVL(v1.DLA_D06,0)
-        + NVL(v1.TTKDVT,0)  + NVL(v1.TTKDGPS,0) AS DLA,
           ld.last_date
         FROM (
-            SELECT *
-            FROM (
                 SELECT ten_chi_tieu,
                       area,
                       shop_code,
                       emp_code,
-                      SUM(thuc_hien) th
+                      SUM(thuc_hien) thuc_hien
                 FROM db01_owner.thuc_hien_kpi_dla_nhan_vien
                 WHERE thang = TO_DATE(to_date('${startOfMonth}','dd/mm/rrrr'),'dd/mm/rrrr')
-                GROUP BY ten_chi_tieu, area, shop_code, emp_code
-            )
-            PIVOT (
-                SUM(th)
-                FOR area IN (
-                    'DLA_T01' DLA_T01, 'DLA_T02' DLA_T02,
-                    'DLA_T03' DLA_T03, 'DLA_T04' DLA_T04,
-                    'DLA_T05' DLA_T05, 'DLA_T06' DLA_T06,
-                    'DLA_T07' DLA_T07, 'DLA_T08' DLA_T08,
-                    'DLA_T09' DLA_T09, 'DLA_T10' DLA_T10,
-                    'DLA_T11' DLA_T11, 'DLA_T12' DLA_T12,
-                    'DLA_T13' DLA_T13,
-                    'DLA_D01' DLA_D01, 'DLA_D02' DLA_D02,
-                    'DLA_D03' DLA_D03, 'DLA_D04' DLA_D04,
-                    'DLA_D05' DLA_D05, 'DLA_D06' DLA_D06,
-                    'TTKDVT'  TTKDVT,
-                    'TTKDGPS' TTKDGPS
-                  )
-                )
+                GROUP BY ten_chi_tieu, area, shop_code, emp_code  
         ) v1
             LEFT JOIN (
                 SELECT ten_chi_tieu,
