@@ -529,7 +529,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
 
-    if (monthString && startOfMonth&&matchSearch) {
+    if (monthString && startOfMonth && matchSearch) {
 
       let sql = `
        SELECT v1.*,
@@ -586,7 +586,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
         res.send({ result: result });
       });
     } else {
-      res.send({ error: "Có lỗi xảy ra" });
+      res.send({ error: "Có lỗi xảy ra", monthString, startOfMonth, matchSearch });
     }
 
 
@@ -712,7 +712,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             (select shop_code from db01_owner.map_shopcode_area_ward_new where area_code =:area )
             and status = '1'
             and  emp_code like :matchSearch
-                      `,
+              `,
           {
             replacements: { area: area, matchSearch: matchSearch },
             type: sequelize.QueryTypes.SELECT,
@@ -736,7 +736,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
   }
   async searcEmployeeByEmpcode(req, res) {
     const matchSearch = req.query.matchSearch;
-    if ( matchSearch) {
+    if (matchSearch) {
 
       try {
 
