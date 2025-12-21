@@ -5,7 +5,7 @@ router.use("/dashboard-plan-kpi", dashboardController.getDashBoardPlanKpi);
 router.use("/dashboard-plan-kpi-dla", dashboardController.getDashBoardPlanKpiDLA);
 router.use("/dashboard-exec-kpi", dashboardController.getDashBoardExecKpi);
 router.use("/dashboard-exec-kpi-dla", dashboardController.getDashBoardExecKpiDLA);
-router.get("/dashboard-exec-kpi-dla-nhan_vien", dashboardController.getDashBoardExecKpiDLAEmployee);
+router.get("/dashboard-exec-kpi-dla-nhan-vien", dashboardController.getDashBoardExecKpiDLAEmployee);
 router.post("/dashboard-create-manual-kpi", dashboardController.createManualKpi);
 router.post("/dashboard-create-manual-list-kpi", dashboardController.createManualListKpi);
 router.post("/dashboard-create-manual-list-kpi-dla", dashboardController.createManualListKpiDLA);
