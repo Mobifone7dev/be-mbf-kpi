@@ -510,10 +510,78 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
                 SELECT ten_chi_tieu,
                       MAX(last_date) last_date
                 FROM db01_owner.thuc_hien_kpi_dla
-                WHERE thang = TO_DATE('01/12/2025','dd/mm/rrrr')
+                WHERE thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
                 GROUP BY ten_chi_tieu
             ) ld
             ON v1.ten_chi_tieu = ld.ten_chi_tieu `;
+      DbConnection.getConnected(sql, {}, function (result) {
+        res.send({ result: result });
+      });
+    } else {
+      res.send({ error: "Có lỗi xảy ra" });
+    }
+
+
+  }
+  async getDashBoardExecKpiDLAEmployee(req, res) {
+    var monthString = req.query.month;
+    var matchSearch = req.query.matchSearch;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+
+    if (monthString && startOfMonth&&matchSearch) {
+
+      let sql = `
+       SELECT v1.*,
+          NVL(v1.DLA_T01,0) + NVL(v1.DLA_T02,0) + NVL(v1.DLA_T03,0)
+        + NVL(v1.DLA_T04,0) + NVL(v1.DLA_T05,0) + NVL(v1.DLA_T06,0)
+        + NVL(v1.DLA_T07,0) + NVL(v1.DLA_T08,0) + NVL(v1.DLA_T09,0)
+        + NVL(v1.DLA_T10,0) + NVL(v1.DLA_T11,0) + NVL(v1.DLA_T12,0)
+        + NVL(v1.DLA_T13,0)
+        + NVL(v1.DLA_D01,0) + NVL(v1.DLA_D02,0) + NVL(v1.DLA_D03,0)
+        + NVL(v1.DLA_D04,0) + NVL(v1.DLA_D05,0) + NVL(v1.DLA_D06,0)
+        + NVL(v1.TTKDVT,0)  + NVL(v1.TTKDGPS,0) AS DLA,
+          ld.last_date
+        FROM (
+            SELECT *
+            FROM (
+                SELECT ten_chi_tieu,
+                      area,
+                      shop_code,
+                      emp_code,
+                      SUM(thuc_hien) th
+                FROM db01_owner.thuc_hien_kpi_dla_nhan_vien
+                WHERE thang = TO_DATE(to_date('${startOfMonth}','dd/mm/rrrr'),'dd/mm/rrrr')
+                GROUP BY ten_chi_tieu, area, shop_code, emp_code
+            )
+            PIVOT (
+                SUM(th)
+                FOR area IN (
+                    'DLA_T01' DLA_T01, 'DLA_T02' DLA_T02,
+                    'DLA_T03' DLA_T03, 'DLA_T04' DLA_T04,
+                    'DLA_T05' DLA_T05, 'DLA_T06' DLA_T06,
+                    'DLA_T07' DLA_T07, 'DLA_T08' DLA_T08,
+                    'DLA_T09' DLA_T09, 'DLA_T10' DLA_T10,
+                    'DLA_T11' DLA_T11, 'DLA_T12' DLA_T12,
+                    'DLA_T13' DLA_T13,
+                    'DLA_D01' DLA_D01, 'DLA_D02' DLA_D02,
+                    'DLA_D03' DLA_D03, 'DLA_D04' DLA_D04,
+                    'DLA_D05' DLA_D05, 'DLA_D06' DLA_D06,
+                    'TTKDVT'  TTKDVT,
+                    'TTKDGPS' TTKDGPS
+                  )
+                )
+        ) v1
+            LEFT JOIN (
+                SELECT ten_chi_tieu,
+                      MAX(last_date) last_date
+                FROM db01_owner.thuc_hien_kpi_dla_nhan_vien
+                WHERE thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+                GROUP BY ten_chi_tieu
+            ) ld
+            ON v1.ten_chi_tieu = ld.ten_chi_tieu
+            where emp_code like '%${matchSearch}%'
+            `;
       DbConnection.getConnected(sql, {}, function (result) {
         res.send({ result: result });
       });
