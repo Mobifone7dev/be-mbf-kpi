@@ -16,6 +16,7 @@ function route(app) {
   app.use("/user-role", authenticateToken, userRoleRouter);
   app.use("/dashboard-thidua", dashboardThiduaRouter);
   app.use("/dashboard-thidua-t08", dashboardThiduaT08Router);
+  app.use("/authentication", authenticateRouter);
 
 
 }
