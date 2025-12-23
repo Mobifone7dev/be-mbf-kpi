@@ -553,7 +553,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
                 GROUP BY ten_chi_tieu
             ) ld
             ON v1.ten_chi_tieu = ld.ten_chi_tieu
-            where emp_code like '%${matchSearch}%'
+            where emp_code like '${matchSearch}'
             `;
       if (area) {
         sql += ` and v1.area = '${area}'`
