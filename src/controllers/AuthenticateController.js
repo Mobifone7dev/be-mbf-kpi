@@ -106,6 +106,85 @@ class Authenticate_Controller {
       res.json({ message: "Please Provide User And Password" });
     }
   }
+   async changPassword(req, res) {
+    const { user_code, old_password, new_password } = req.body;
+    if (user_code && old_password && new_password) {
+      let resQuery = `SELECT user_code, password_hash FROM users WHERE user_code = :user_code`;
+      try {
+        const result = await sequelize.query(
+          resQuery
+          ,
+          {
+            replacements: { user_code: user_code },
+            type: sequelize.QueryTypes.SELECT,
+          }
+        );
+
+        if (result && result.length > 0) {
+          const user = result[0];
+
+          const isMatch = await bcrypt.compare(old_password, user.PASSWORD_HASH);
+
+          if (!isMatch) {
+            return res.status(401).json({ message: 'Mật khẩu cũ không đúng' });
+          } else {
+            const newHash = await bcrypt.hash(new_password, 10);
+
+            let queryUpdate = `UPDATE users SET password_hash = :new_hash WHERE user_code = :user_code`;
+
+            const result = await sequelize.query(
+              queryUpdate
+              ,
+              {
+                replacements: { user_code: user_code, new_hash: newHash },
+                type: sequelize.QueryTypes.UPDATE,
+              }
+            )
+            if (result) {
+              return res.status(200).json({ message: 'Tài khoản đã đổi mật khẩu thành công' });
+
+            }
+
+          }
+
+        } else {
+          return res.status(401).json({ message: 'Tài khoản không tồn tại' });
+
+        }
+      } catch (err) {
+        console.log("error", error);
+        throw new Error(`Có lỗi xảy ra trong quá trình thực hiện: ${error.message}`);
+      }
+
+    } else {
+      res.json({ message: "Không đủ tham số đầu vào" });
+
+    }
+  }
+
+
+  async me(req, res) {
+    const token = req.cookies.token; // lấy từ cookie
+    // hoặc nếu bạn dùng localStorage phía FE thì sẽ gửi qua header
+    // const token = req.headers["authorization"]?.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "No token", isAuthenticated: false });
+    }
+
+    try {
+      const decoded = jwt.verify(token, SECRET);
+      // decoded = { username: "demo", iat: ..., exp: ... }
+      return res.json({ user: decoded });
+    } catch (err) {
+      return res.status(403).json({ message: "Invalid token", ísAuthenticated: false });
+    }
+
+  }
+  async logout(req, res) {
+    res.clearCookie("accessToken");
+    res.json({ message: "Logged out successfully" });
+  }
 }
 
 module.exports = new Authenticate_Controller();
