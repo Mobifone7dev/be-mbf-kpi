@@ -541,7 +541,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
                       emp_code,
                       SUM(thuc_hien) thuc_hien
                 FROM db01_owner.thuc_hien_kpi_dla_nhan_vien
-                WHERE thang = TO_DATE(to_date('${startOfMonth}','dd/mm/rrrr'),'dd/mm/rrrr')
+                WHERE thang = to_date('${startOfMonth}','dd/mm/rrrr')
                 GROUP BY ten_chi_tieu, area, shop_code, emp_code  
         ) v1
             LEFT JOIN (
