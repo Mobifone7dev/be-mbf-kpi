@@ -524,8 +524,9 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
   }
   async getDashBoardExecKpiDLAEmployee(req, res) {
-    var monthString = req.query.month;
-    var matchSearch = req.query.matchSearch;
+    const monthString = req.query.month;
+    const area = req.query.area;
+    const matchSearch = req.query.matchSearch;
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
 
@@ -554,6 +555,9 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             ON v1.ten_chi_tieu = ld.ten_chi_tieu
             where emp_code like '%${matchSearch}%'
             `;
+      if (area) {
+        sql += ` and v1.area=${area}`
+      }
       DbConnection.getConnected(sql, {}, function (result) {
         res.send({ result: result });
       });
