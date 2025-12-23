@@ -556,7 +556,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             where emp_code like '%${matchSearch}%'
             `;
       if (area) {
-        sql += ` and v1.area=${area}`
+        sql += ` and v1.area = '${area}'`
       }
       DbConnection.getConnected(sql, {}, function (result) {
         res.send({ result: result });
