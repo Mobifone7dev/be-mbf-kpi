@@ -720,35 +720,34 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             EMP_CODE: object.EMP_CODE
 
           }
-
-
-          const existingKpi = await sequelize.query(
-            `SELECT * FROM db01_owner.chitieu_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
+          if (info.TEN_CHI_TIEU && info.EMP_CODE && info.MONTH) {
+            const existingKpi = await sequelize.query(
+              `SELECT * FROM db01_owner.chitieu_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
                and thang = to_date(:MONTH,'dd-mm-rrrr')
                and emp_code = :EMP_CODE
                `,
-            {
-              replacements: { TEN_CHI_TIEU: info.TEN_CHI_TIEU, MONTH: info.MONTH, EMP_CODE: info.EMP_CODE },
-              type: sequelize.QueryTypes.SELECT,
-            }
-          );
-          if (existingKpi.length > 0) {
-            await sequelize.query(
-              `delete from db01_owner.chitieu_kpi_dla_nhan_vien 
+              {
+                replacements: { TEN_CHI_TIEU: info.TEN_CHI_TIEU, MONTH: info.MONTH, EMP_CODE: info.EMP_CODE },
+                type: sequelize.QueryTypes.SELECT,
+              }
+            );
+            if (existingKpi.length > 0) {
+              await sequelize.query(
+                `delete from db01_owner.chitieu_kpi_dla_nhan_vien 
                 WHERE ten_chi_tieu = :TEN_CHI_TIEU and thang = to_date(:MONTH,'dd-mm-rrrr')
                 and emp_code =:EMP_CODE
                 `,
-              {
-                replacements: {
-                  TEN_CHI_TIEU: info.TEN_CHI_TIEU,
-                  MONTH: info.MONTH,
-                  EMP_CODE: info.EMP_CODE,
-                },
-                type: sequelize.QueryTypes.DELETE,
-              }
-            );
-            await sequelize.query(
-              `insert into  db01_owner.chitieu_kpi_dla_nhan_vien 
+                {
+                  replacements: {
+                    TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                    MONTH: info.MONTH,
+                    EMP_CODE: info.EMP_CODE,
+                  },
+                  type: sequelize.QueryTypes.DELETE,
+                }
+              );
+              await sequelize.query(
+                `insert into  db01_owner.chitieu_kpi_dla_nhan_vien 
                 (ten_chi_tieu, thang, emp_code,thuc_hien)
                 values
                 (
@@ -758,22 +757,22 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
                 :THUC_HIEN
                 )
                   `,
-              {
-                replacements: {
-                  TEN_CHI_TIEU: info.TEN_CHI_TIEU,
-                  MONTH: info.MONTH,
-                  EMP_CODE: info.EMP_CODE,
-                  THUC_HIEN: info.THUC_HIEN
-                },
-                type: sequelize.QueryTypes.INSERT,
-              }
-            );
+                {
+                  replacements: {
+                    TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                    MONTH: info.MONTH,
+                    EMP_CODE: info.EMP_CODE,
+                    THUC_HIEN: info.THUC_HIEN
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
 
-            // console.log("check result", result);
+              // console.log("check result", result);
 
-          } else {
-            const result = await sequelize.query(
-              `insert into  db01_owner.chitieu_kpi_dla_nhan_vien 
+            } else {
+              const result = await sequelize.query(
+                `insert into  db01_owner.chitieu_kpi_dla_nhan_vien 
               (ten_chi_tieu, thang, emp_code,thuc_hien)
               values
               (
@@ -783,18 +782,24 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
               :THUC_HIEN
               )
                 `,
-              {
-                replacements: {
-                  TEN_CHI_TIEU: info.TEN_CHI_TIEU,
-                  MONTH: info.MONTH,
-                  EMP_CODE: info.EMP_CODE,
-                  THUC_HIEN: info.THUC_HIEN,
-                },
-                type: sequelize.QueryTypes.INSERT,
-              }
-            );
+                {
+                  replacements: {
+                    TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                    MONTH: info.MONTH,
+                    EMP_CODE: info.EMP_CODE,
+                    THUC_HIEN: info.THUC_HIEN,
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
+            }
+
+          } else {
+            res.status(400).send({ error: "Có lỗi xảy ra", monthString, startOfMonth, matchSearch });
 
           }
+
           // console.log("check result", result);
         };
         res.send({ data: { sussess: true } })

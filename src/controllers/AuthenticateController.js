@@ -4,19 +4,19 @@ const ldap = require("ldapjs");
 const DbConnection = require("../../DbConnection");
 const { sequelize } = require('../models'); // Import s
 const { HttpsProxyAgent } = require("https-proxy-agent");
-const proxy = "http://10.39.152.30:3128";
-const agent = new HttpsProxyAgent(proxy);
-(async () => {
-  try {
-    const fetch = (await import("node-fetch")).default; // 👈 import động
-    const res = await fetch("https://www.google.com", { agent });
-    console.log("Status:", res.status);
-    const text = await res.text();
-    console.log("Body sample:", text.substring(0, 200)); // in thử 200 ký tự đầu
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-})();
+// const proxy = "http://10.39.152.30:3128";
+// const agent = new HttpsProxyAgent(proxy);
+// (async () => {
+//   try {
+//     const fetch = (await import("node-fetch")).default; // 👈 import động
+//     const res = await fetch("https://www.google.com", { agent });
+//     console.log("Status:", res.status);
+//     const text = await res.text();
+//     console.log("Body sample:", text.substring(0, 200)); // in thử 200 ký tự đầu
+//   } catch (err) {
+//     console.error("Fetch error:", err);
+//   }
+// })();
 class Authenticate_Controller {
   async index(req, res) {
     const username = req.body.username;
@@ -27,20 +27,20 @@ class Authenticate_Controller {
       return res.status(400).json({ error: "Captcha token is required" });
     }
     // Verify captcha
-    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
-    const fetch = (await import("node-fetch")).default; // 👈 import động
-    const response = await fetch(verifyUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`,
-      agent,
-    });
+    // const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+    // const fetch = (await import("node-fetch")).default; // 👈 import động
+    // const response = await fetch(verifyUrl, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    //   body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`,
+    //   agent,
+    // });
 
-    const data = await response.json();
-    if (!data.success || (data.score && data.score < 0.5)) {
-      return res.status(400).json({ error: "Captcha verification failed" });
-    }
-    console.log("process.env.LDAP_URI", process.env.LDAP_URI);
+    // const data = await response.json();
+    // if (!data.success || (data.score && data.score < 0.5)) {
+    //   return res.status(400).json({ error: "Captcha verification failed" });
+    // }
+    // console.log("process.env.LDAP_URI", process.env.LDAP_URI);
     if (username && password) {
       var client = ldap.createClient({
         url: process.env.LDAP_URI,
