@@ -683,18 +683,20 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
     const kpiList = req.body.kpiList;
     if (kpiList && kpiList.length > 0) {
       try {
-        console.log("kpiList", kpiList);
+        // console.log("kpiList", kpiList);
         for (const object of kpiList) {
+
           let info = {
-            TEN_CHI_TIEU: object.TEN_CHi_TIEU,
+            TEN_CHI_TIEU: object.TEN_CHI_TIEU,
             THUC_HIEN: object.THUC_HIEN,
             MONTH: startOfMonth,
             EMP_CODE: object.EMP_CODE
 
           }
-      
+
+
           const existingKpi = await sequelize.query(
-            `SELECT * FROM db01_owner.thuc_hien_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
+            `SELECT * FROM db01_owner.chitieu_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
                and thang = to_date(:MONTH,'dd-mm-rrrr')
                and emp_code = :EMP_CODE
                `,
@@ -705,7 +707,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
           );
           if (existingKpi.length > 0) {
             await sequelize.query(
-              `delete from db01_owner.thuc_hien_kpi_dla 
+              `delete from db01_owner.chitieu_kpi_dla_nhan_vien 
                 WHERE ten_chi_tieu = :TEN_CHI_TIEU and thang = to_date(:MONTH,'dd-mm-rrrr')
                 and emp_code =:EMP_CODE
                 `,
@@ -719,7 +721,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
               }
             );
             await sequelize.query(
-              `insert into  db01_owner.thuc_hien_kpi_dla_nhan_vien 
+              `insert into  db01_owner.chitieu_kpi_dla_nhan_vien 
                 (ten_chi_tieu, thang, emp_code,thuc_hien)
                 values
                 (
@@ -740,11 +742,11 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
               }
             );
 
-            console.log("check result", result);
+            // console.log("check result", result);
 
           } else {
             const result = await sequelize.query(
-              `insert into  db01_owner.thuc_hien_kpi_dla_nhan_vien 
+              `insert into  db01_owner.chitieu_kpi_dla_nhan_vien 
               (ten_chi_tieu, thang, emp_code,thuc_hien)
               values
               (
@@ -756,7 +758,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
                 `,
               {
                 replacements: {
-                  TEN_CHi_TIEU: info.TEN_CHI_TIEU,
+                  TEN_CHI_TIEU: info.TEN_CHI_TIEU,
                   MONTH: info.MONTH,
                   EMP_CODE: info.EMP_CODE,
                   THUC_HIEN: info.THUC_HIEN,
@@ -766,7 +768,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             );
 
           }
-          console.log("check result", result);
+          // console.log("check result", result);
         };
         res.send({ data: { sussess: true } })
       } catch (error) {
