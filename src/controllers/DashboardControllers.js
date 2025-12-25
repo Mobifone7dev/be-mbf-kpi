@@ -73,6 +73,29 @@ class DashboardController {
 
   }
 
+  async getDashBoardPlanKpiDLAEmployee(req, res) {
+    let monthString = req.query.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    let sql;
+    if (startOfMonth) {
+      sql = `select * from db01_owner.chitieu_kpi_dla_nhan_vien where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+    }
+    if (monthString && startOfMonth) {
+      DbConnection.getConnected(sql, {}, function (data) {
+
+        if (data) {
+          data.map((item, index) => { });
+          res.status(200).json({ result: data }); // This runs as well.
+        }
+      });
+    } else {
+      res.status(401).json({ error: "có lỗi xảy ra" }); // This runs as well.
+
+    }
+
+  }
+
   async getDashBoardExecKpi(req, res) {
     var monthString = req.query.month;
     const myDate = moment(monthString, "DD-MM-YYYY");
