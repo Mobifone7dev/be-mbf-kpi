@@ -796,7 +796,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             }
 
           } else {
-            res.status(400).send({ error: "Có lỗi xảy ra", monthString, startOfMonth, matchSearch });
+            res.status(400).send({ error: "Có lỗi xảy ra - thieu truong bat buoc" });
 
           }
 
