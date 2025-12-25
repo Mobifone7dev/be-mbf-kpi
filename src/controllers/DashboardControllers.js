@@ -674,6 +674,106 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       }
     }
   }
+  async createManualListKpiDLAEmployee(req, res) {
+    const result = validationResult(req);
+    if (result.isEmpty())
+      var monthString = req.body.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    const kpiList = req.body.kpiList;
+    if (kpiList && kpiList.length > 0) {
+      try {
+        console.log("kpiList", kpiList);
+        for (const object of kpiList) {
+          let info = {
+            TEN_CHI_TIEU: object.TEN_CHi_TIEU,
+            THUC_HIEN: object.THUC_HIEN,
+            MONTH: startOfMonth,
+            EMP_CODE: object.EMP_CODE
+
+          }
+      
+          const existingKpi = await sequelize.query(
+            `SELECT * FROM db01_owner.thuc_hien_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
+               and thang = to_date(:MONTH,'dd-mm-rrrr')
+               and emp_code = :EMP_CODE
+               `,
+            {
+              replacements: { TEN_CHI_TIEU: info.TEN_CHI_TIEU, MONTH: info.MONTH, EMP_CODE: info.EMP_CODE },
+              type: sequelize.QueryTypes.SELECT,
+            }
+          );
+          if (existingKpi.length > 0) {
+            await sequelize.query(
+              `delete from db01_owner.thuc_hien_kpi_dla 
+                WHERE ten_chi_tieu = :TEN_CHI_TIEU and thang = to_date(:MONTH,'dd-mm-rrrr')
+                and emp_code =:EMP_CODE
+                `,
+              {
+                replacements: {
+                  TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                  MONTH: info.MONTH,
+                  EMP_CODE: info.EMP_CODE,
+                },
+                type: sequelize.QueryTypes.DELETE,
+              }
+            );
+            await sequelize.query(
+              `insert into  db01_owner.thuc_hien_kpi_dla_nhan_vien 
+                (ten_chi_tieu, thang, emp_code,thuc_hien)
+                values
+                (
+                :TEN_CHI_TIEU,
+                 to_date(:MONTH,'dd-mm-rrrr'),
+                :EMP_CODE,
+                :THUC_HIEN
+                )
+                  `,
+              {
+                replacements: {
+                  TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                  MONTH: info.MONTH,
+                  EMP_CODE: info.EMP_CODE,
+                  THUC_HIEN: info.THUC_HIEN
+                },
+                type: sequelize.QueryTypes.INSERT,
+              }
+            );
+
+            console.log("check result", result);
+
+          } else {
+            const result = await sequelize.query(
+              `insert into  db01_owner.thuc_hien_kpi_dla_nhan_vien 
+              (ten_chi_tieu, thang, emp_code,thuc_hien)
+              values
+              (
+              :TEN_CHI_TIEU,
+               to_date(:MONTH,'dd-mm-rrrr'),
+              :EMP_CODE,
+              :THUC_HIEN
+              )
+                `,
+              {
+                replacements: {
+                  TEN_CHi_TIEU: info.TEN_CHI_TIEU,
+                  MONTH: info.MONTH,
+                  EMP_CODE: info.EMP_CODE,
+                  THUC_HIEN: info.THUC_HIEN,
+                },
+                type: sequelize.QueryTypes.INSERT,
+              }
+            );
+
+          }
+          console.log("check result", result);
+        };
+        res.send({ data: { sussess: true } })
+      } catch (error) {
+        throw new Error(`Có lỗi xảy ra:  ${error}`)
+      }
+    }
+  }
   async searcEmployeebyArea(req, res) {
     const area = req.query.area;
     const matchSearch = req.query.matchSearch;

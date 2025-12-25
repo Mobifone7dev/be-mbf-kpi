@@ -9,6 +9,7 @@ router.get("/dashboard-exec-kpi-dla-nhan-vien", dashboardController.getDashBoard
 router.post("/dashboard-create-manual-kpi", dashboardController.createManualKpi);
 router.post("/dashboard-create-manual-list-kpi", dashboardController.createManualListKpi);
 router.post("/dashboard-create-manual-list-kpi-dla", dashboardController.createManualListKpiDLA);
+router.post("/dashboard-create-manual-list-kpi-dla-nhan-vien", dashboardController.createManualListKpiDLAEmployee);
 router.get("/dashboard-export-excel-exec-kpi", dashboardController.exportExcelExecKpi);
 router.get("/dashboard-search-employee-by-area", dashboardController.searcEmployeebyArea);
 router.get("/dashboard-search-employee-by-empcode", dashboardController.searcEmployeeByEmpcode);
