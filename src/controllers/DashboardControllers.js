@@ -713,7 +713,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
         // console.log("kpiList", kpiList);
         for (const object of kpiList) {
 
-          if (object.TEN_CHI_TIEU && object.EMP_CODE) {
+          if (object && object.TEN_CHI_TIEU && object.EMP_CODE) {
             let info = {
               TEN_CHI_TIEU: object.TEN_CHI_TIEU,
               THUC_HIEN: object.THUC_HIEN,
