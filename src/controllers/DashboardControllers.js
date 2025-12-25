@@ -713,14 +713,15 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
         // console.log("kpiList", kpiList);
         for (const object of kpiList) {
 
-          let info = {
-            TEN_CHI_TIEU: object.TEN_CHI_TIEU,
-            THUC_HIEN: object.THUC_HIEN,
-            MONTH: startOfMonth,
-            EMP_CODE: object.EMP_CODE
 
-          }
-          if (info.TEN_CHI_TIEU && info.EMP_CODE && info.MONTH) {
+          if (object.TEN_CHI_TIEU && object.EMP_CODE && object.MONTH) {
+            let info = {
+              TEN_CHI_TIEU: object.TEN_CHI_TIEU,
+              THUC_HIEN: object.THUC_HIEN,
+              MONTH: startOfMonth,
+              EMP_CODE: object.EMP_CODE
+
+            }
             const existingKpi = await sequelize.query(
               `SELECT * FROM db01_owner.chitieu_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
                and thang = to_date(:MONTH,'dd-mm-rrrr')
