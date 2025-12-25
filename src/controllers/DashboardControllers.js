@@ -75,11 +75,15 @@ class DashboardController {
 
   async getDashBoardPlanKpiDLAEmployee(req, res) {
     let monthString = req.query.month;
+    let matchSearch = req.query.matchSearch;
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
     let sql;
-    if (startOfMonth) {
-      sql = `select * from db01_owner.chitieu_kpi_dla_nhan_vien where thang= to_date('${startOfMonth}','DD-MM-RRRR')`;
+    if (startOfMonth && matchSearch) {
+      sql = `select * from db01_owner.chitieu_kpi_dla_nhan_vien 
+      where thang= to_date('${startOfMonth}','DD-MM-RRRR')
+      and emp_code like '${matchSearch}'
+      `;
     }
     if (monthString && startOfMonth) {
       DbConnection.getConnected(sql, {}, function (data) {
