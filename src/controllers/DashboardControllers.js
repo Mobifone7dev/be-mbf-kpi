@@ -713,8 +713,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
         // console.log("kpiList", kpiList);
         for (const object of kpiList) {
 
-
-          if (object.TEN_CHI_TIEU && object.EMP_CODE && object.MONTH) {
+          if (object.TEN_CHI_TIEU && object.EMP_CODE) {
             let info = {
               TEN_CHI_TIEU: object.TEN_CHI_TIEU,
               THUC_HIEN: object.THUC_HIEN,
@@ -798,7 +797,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
           } else {
             res.status(400).send({ error: "Có lỗi xảy ra - thieu truong bat buoc" });
-
+            return;
           }
 
           // console.log("check result", result);
