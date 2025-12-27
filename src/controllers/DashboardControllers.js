@@ -851,22 +851,11 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       try {
 
         sequelize.query(
-          `SELECT
-              a.emp_code,
-              a.emp_name,
-              a.shop_code,
-              b.shop_name,
-              b.area_code,
-              b.ward_code,
-              c.phone,
-              c.email
-          FROM db01_owner.v_employee a
-          JOIN db01_owner.map_shopcode_area_ward_new b
-              ON a.shop_code = b.shop_code
-          LEFT JOIN db01_owner.danh_sach_dv c
-              ON c.emp_code = a.emp_code
-          WHERE a.status = 1
-            AND a.shop_code LIKE 'DLA%'
+          `select a.emp_code, a.emp_name, a.shop_code, b.shop_name, b.area_code, b.ward_code, c.phone,c.email from db01_owner.v_employee a
+            inner join (select shop_code, shop_name, area_code, ward_code from db01_owner.map_shopcode_area_ward_new  )b
+            on a.shop_code = b.shop_code and a.status =1
+            inner join db01_owner.danh_sach_dv c on c.emp_code = a.emp_code
+            and a.shop_code like 'DLA%'
             and  a.emp_code like :matchSearch
            `,
           {
