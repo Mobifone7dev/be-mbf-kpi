@@ -856,7 +856,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
             on a.shop_code = b.shop_code and a.status =1
             left join danh_sach_dv c on c.emp_code = a.emp_code
             and a.shop_code like 'DLA%'
-            and  emp_code like :matchSearch
+            and  a.emp_code like :matchSearch
            `,
           {
             replacements: { matchSearch: matchSearch },
