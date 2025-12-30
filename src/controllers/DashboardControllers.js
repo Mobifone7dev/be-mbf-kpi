@@ -808,6 +808,124 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       }
     }
   }
+
+  async createManualListKpiDLAEmployeeExec(req, res) {
+    const result = validationResult(req);
+    if (result.isEmpty())
+      var monthString = req.body.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    const kpiList = req.body.kpiList;
+    if (kpiList && kpiList.length > 0) {
+      try {
+        // console.log("kpiList", kpiList);
+        for (const object of kpiList) {
+
+          if (object && object.TEN_CHI_TIEU && object.EMP_CODE) {
+            let info = {
+              TEN_CHI_TIEU: object.TEN_CHI_TIEU,
+              THUC_HIEN: object.THUC_HIEN,
+              MONTH: startOfMonth,
+              EMP_CODE: object.EMP_CODE,
+              AREA: object.AREA,
+              SHOP_CODE: object.SHOP_CODE
+
+            }
+            const existingKpi = await sequelize.query(
+              `SELECT * FROM db01_owner.thuc_hien_kpi_dla_nhan_vien WHERE ten_chi_tieu = :TEN_CHI_TIEU
+               and thang = to_date(:MONTH,'dd-mm-rrrr')
+               and emp_code = :EMP_CODE
+               `,
+              {
+                replacements: { TEN_CHI_TIEU: info.TEN_CHI_TIEU, MONTH: info.MONTH, EMP_CODE: info.EMP_CODE },
+                type: sequelize.QueryTypes.SELECT,
+              }
+            );
+            if (existingKpi.length > 0) {
+              await sequelize.query(
+                `delete from db01_owner.thuc_hien_kpi_dla_nhan_vien 
+                WHERE ten_chi_tieu = :TEN_CHI_TIEU and thang = to_date(:MONTH,'dd-mm-rrrr')
+                and emp_code =:EMP_CODE
+                `,
+                {
+                  replacements: {
+                    TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                    MONTH: info.MONTH,
+                    EMP_CODE: info.EMP_CODE,
+                  },
+                  type: sequelize.QueryTypes.DELETE,
+                }
+              );
+              await sequelize.query(
+                `insert into  db01_owner.thuc_hien_kpi_dla_nhan_vien 
+                (ten_chi_tieu, thang, emp_code,thuc_hien, area, shop_code)
+                values
+                (
+                :TEN_CHI_TIEU,
+                 to_date(:MONTH,'dd-mm-rrrr'),
+                :EMP_CODE,
+                :THUC_HIEN,
+                :AREA,
+                :SHOP_CODE
+                )
+                  `,
+                {
+                  replacements: {
+                    TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                    MONTH: info.MONTH,
+                    EMP_CODE: info.EMP_CODE,
+                    THUC_HIEN: info.THUC_HIEN,
+                    AREA: info.AREA,
+                    SHOP_CODE: info.SHOP_CODE
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
+              // console.log("check result", result);
+
+            } else {
+              const result = await sequelize.query(
+                `insert into  db01_owner.thuc_hien_kpi_dla_nhan_vien 
+              (ten_chi_tieu, thang, emp_code,thuc_hien, area, shop_code)
+              values
+              (
+              :TEN_CHI_TIEU,
+               to_date(:MONTH,'dd-mm-rrrr'),
+              :EMP_CODE,
+              :THUC_HIEN,
+              :AREA,
+              :SHOP_CODE
+              )
+                `,
+                {
+                  replacements: {
+                    TEN_CHI_TIEU: info.TEN_CHI_TIEU,
+                    MONTH: info.MONTH,
+                    EMP_CODE: info.EMP_CODE,
+                    THUC_HIEN: info.THUC_HIEN,
+                    AREA: info.AREA,
+                    SHOP_CODE: info.SHOP_CODE
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              );
+
+            }
+
+          } else {
+            res.status(400).send({ error: "Có lỗi xảy ra - thieu truong bat buoc" });
+            return;
+          }
+
+          // console.log("check result", result);
+        };
+        res.send({ data: { sussess: true } })
+      } catch (error) {
+        throw new Error(`Có lỗi xảy ra:  ${error}`)
+      }
+    }
+  }
   async searcEmployeebyArea(req, res) {
     const area = req.query.area;
     const matchSearch = req.query.matchSearch;
