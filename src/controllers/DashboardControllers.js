@@ -1039,6 +1039,42 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
       res.status(400).send({ data: { error: 'thieu thong tin matchSearch' } })
     }
   }
+
+  async get_TBTT_PTM_EmployeeCode(req, res) {
+    const matchSearch = req.query.matchSearch;
+    var monthString = req.body.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    if (matchSearch && startOfMonth) {
+
+      try {
+
+        sequelize.query(
+          `select * from th_tb_ptm_kpi_dla a
+            WHERE a.status = 1
+            and a.month = TO_DATE(:month,'dd/mm/rrrr')
+            and  a.emp_code like :matchSearch
+           `,
+          {
+            replacements: { matchSearch: matchSearch, month: startOfMonth },
+            type: sequelize.QueryTypes.SELECT,
+          }
+        ).then(data => {
+          res.json({ data });
+        })
+          .catch(err => {
+            console.error("Error fetching  data:", err);
+            res.status(500).json({ error: "Internal Server Error" });
+          });
+
+      } catch (error) {
+        throw new Error(`Có lỗi xảy ra:  ${error}`)
+
+      }
+    } else {
+      res.status(400).send({ data: { error: 'thieu thong tin matchSearch va month' } })
+    }
+  }
 }
 
 

@@ -15,6 +15,9 @@ router.post("/dashboard-create-manual-list-kpi-dla-nhan-vien-thuc-hien", dashboa
 router.get("/dashboard-export-excel-exec-kpi", dashboardController.exportExcelExecKpi);
 router.get("/dashboard-search-employee-by-area", dashboardController.searcEmployeebyArea);
 router.get("/dashboard-search-employee-by-empcode", dashboardController.searcEmployeeByEmpcode);
+router.get("/dashboard-search-employee-tbtt-ptm-by-empcode", dashboardController.get_TBTT_PTM_EmployeeCode);
+
+
 router.use("/", dashboardController.index);
 
 module.exports = router;
