@@ -1040,7 +1040,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
     }
   }
 
-  async get_TBTT_PTM_EmployeeCode(req, res) {
+  async get_PTM_EmployeeCode(req, res) {
     const matchSearch = req.query.matchSearch;
     var monthString = req.body.month;
     const myDate = moment(monthString, "DD-MM-YYYY");
