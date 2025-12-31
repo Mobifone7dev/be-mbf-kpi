@@ -1042,17 +1042,16 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
   async get_PTM_EmployeeCode(req, res) {
     const matchSearch = req.query.matchSearch;
-    var monthString = req.body.month;
+    var monthString = req.query.month;
     const myDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
     if (matchSearch && startOfMonth) {
-
       try {
 
         sequelize.query(
-          `select * from th_tb_ptm_kpi_dla a
+          `select * from db01_owner.th_tb_ptm_kpi_dla a
             WHERE a.month = TO_DATE(:month,'dd/mm/rrrr')
-            and  a.emp_code like :matchSearch
+            and  a.nv_pt like :matchSearch
            `,
           {
             replacements: { matchSearch: matchSearch, month: startOfMonth },
@@ -1063,7 +1062,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
         })
           .catch(err => {
             console.error("Error fetching  data:", err);
-            res.status(500).json({ error: "Internal Server Error", error });
+            res.status(500).json({ error: "Internal Server Error", err });
           });
 
       } catch (error) {
