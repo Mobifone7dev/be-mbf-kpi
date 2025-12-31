@@ -1051,8 +1051,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
 
         sequelize.query(
           `select * from th_tb_ptm_kpi_dla a
-            WHERE a.status = 1
-            and a.month = TO_DATE(:month,'dd/mm/rrrr')
+            WHERE a.month = TO_DATE(:month,'dd/mm/rrrr')
             and  a.emp_code like :matchSearch
            `,
           {
@@ -1064,7 +1063,7 @@ STATUS, ACT_STATUS, SUB_TYPE, CUS_TYPE, REG_TYPE, REG_REASON_ID, PROVINCE_PT, DI
         })
           .catch(err => {
             console.error("Error fetching  data:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+            res.status(500).json({ error: "Internal Server Error", error });
           });
 
       } catch (error) {
