@@ -16,6 +16,8 @@ router.get("/dashboard-export-excel-exec-kpi", dashboardController.exportExcelEx
 router.get("/dashboard-search-employee-by-area", dashboardController.searcEmployeebyArea);
 router.get("/dashboard-search-employee-by-empcode", dashboardController.searcEmployeeByEmpcode);
 router.get("/dashboard-search-employee-ptm-by-empcode", dashboardController.get_PTM_EmployeeCode);
+router.get("/dashboard-ptm-by-area", dashboardController.getPtmWithWard);
+
 
 
 router.use("/", dashboardController.index);

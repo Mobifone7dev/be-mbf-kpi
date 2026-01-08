@@ -73,6 +73,51 @@ class DashboardController {
 
   }
 
+  async getPtmWithWard(req, res) {
+    let monthString = req.query.month;
+    const myDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = myDate.startOf("month").format("DD-MM-YYYY");
+    let sql;
+    if (startOfMonth) {
+      sql = `
+            SELECT 
+          a.new_precinct_code,
+          COUNT(a.isdn) AS isdn_count,
+          b.ward_name
+      FROM (
+              SELECT isdn, new_precinct_code
+              FROM db01_owner.tb_ptm_tt_new_precinct
+              WHERE TRUNC(active_date, 'MM') = to_date('${startOfMonth}','DD-MM-RRRR')
+
+              UNION ALL
+              
+              SELECT isdn, new_precinct_code
+              FROM db01_owner.tb_ptm_ts_new_precinct
+              WHERE TRUNC(active_date, 'MM') = to_date('${startOfMonth}','DD-MM-RRRR')
+      ) a
+      LEFT JOIN map_area_ward_new b 
+          ON b.ward_code = a.new_precinct_code
+      GROUP BY 
+          a.new_precinct_code, b.ward_name
+      ORDER BY 
+          a.new_precinct_code
+      `;
+    }
+    if (monthString && startOfMonth) {
+      DbConnection.getConnected(sql, {}, function (data) {
+
+        if (data) {
+          data.map((item, index) => { });
+          res.status(200).json({ result: data }); // This runs as well.
+        }
+      });
+    } else {
+      res.status(401).json({ error: "có lỗi xảy ra" }); // This runs as well.
+
+    }
+
+  }
+
   async getDashBoardPlanKpiDLAEmployee(req, res) {
     let monthString = req.query.month;
     let matchSearch = req.query.matchSearch;
