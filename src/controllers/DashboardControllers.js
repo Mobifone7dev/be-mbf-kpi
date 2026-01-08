@@ -95,7 +95,7 @@ class DashboardController {
               FROM db01_owner.tb_ptm_ts_new_precinct
               WHERE TRUNC(active_date, 'MM') = to_date('${startOfMonth}','DD-MM-RRRR')
       ) a
-      LEFT JOIN map_area_ward_new b 
+      LEFT JOIN db01_owner.map_area_ward_new b 
           ON b.ward_code = a.new_precinct_code
       GROUP BY 
           a.new_precinct_code, b.ward_name
