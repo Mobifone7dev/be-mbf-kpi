@@ -83,7 +83,9 @@ class DashboardController {
             SELECT 
           a.new_precinct_code,
           COUNT(a.isdn) AS isdn_count,
-          b.ward_name
+          b.ward_name,
+          c.ma_vung  as area_code,
+          c.old_district_name
       FROM (
               SELECT isdn, new_precinct_code
               FROM db01_owner.tb_ptm_tt_new_precinct
@@ -97,8 +99,11 @@ class DashboardController {
       ) a
       LEFT JOIN db01_owner.map_area_ward_new b 
           ON b.ward_code = a.new_precinct_code
+       left join an_owner.DLA_MAP_XA_VUNG c 
+     on c.precinct_code =  a.new_precinct_code
+      
       GROUP BY 
-          a.new_precinct_code, b.ward_name
+          a.new_precinct_code, b.ward_name, c.ma_vung, c.old_district_name
       ORDER BY 
           a.new_precinct_code
       `;
