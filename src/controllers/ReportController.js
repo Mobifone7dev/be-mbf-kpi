@@ -84,5 +84,32 @@ class ReportController {
       res.send({ error: "Có lỗi xảy ra" });
     }
   }
+
+
+  async getReportCodeByMonthDetail(req, res) {
+    var monthString = req.query.month;
+    const tempDate = moment(monthString, "DD-MM-YYYY");
+    const startOfMonth = tempDate.startOf("month").format("DD-MM-YYYY");
+
+    if (monthString && startOfMonth) {
+      let sql;
+      sql = `
+            SELECT * from select * from th_tb_ptsl_ts_detail
+            where thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+           union all 
+           select * from th_tb_ptsl_tt_detail
+            where thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+
+          `;
+
+      DbConnection.getConnected(sql, {}, function (result) {
+        if (result) {
+          res.send({ result: result });
+        }
+      });
+    } else {
+      res.send({ error: "Có lỗi xảy ra" });
+    }
+  }
 }
 module.exports = new ReportController();
