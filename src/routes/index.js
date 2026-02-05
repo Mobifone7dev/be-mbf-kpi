@@ -5,6 +5,8 @@ const dashboardThiduaRouter = require("./DashBoardThidua");
 const dashboardThiduaT08Router = require("./DashBoardThiduaT08");
 const authenticateRouter = require("./Authenticate");
 const userRoleRouter = require("./UserRole");
+const reportRouter = require("./ReportRouter");
+
 
 
 function route(app) {
@@ -16,6 +18,7 @@ function route(app) {
   app.use("/user-role", authenticateToken, userRoleRouter);
   app.use("/dashboard-thidua", dashboardThiduaRouter);
   app.use("/dashboard-thidua-t08", dashboardThiduaT08Router);
+  app.use("/report", reportRouter);
   app.use("/authentication", authenticateRouter);
 
 
