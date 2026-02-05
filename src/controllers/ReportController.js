@@ -90,15 +90,20 @@ class ReportController {
     var monthString = req.query.month;
     const tempDate = moment(monthString, "DD-MM-YYYY");
     const startOfMonth = tempDate.startOf("month").format("DD-MM-YYYY");
-
+    const startOfNextMonth = tempDate
+      .add(1, "month")
+      .startOf("month")
+      .format("DD-MM-YYYY");
     if (monthString && startOfMonth) {
       let sql;
       sql = `
             SELECT * from  db01_owner.th_tb_ptsl_ts_detail
-            where active_date = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+            where active_date >= TO_DATE('${startOfMonth}','dd/mm/rrrr')
+            and active_date < TO_DATE('${startOfNextMonth}','dd/mm/rrrr')
            union all 
            select * from db01_owner.th_tb_ptsl_tt_detail
-            where active_date = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+           where active_date = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+           and active_date < TO_DATE('${startOfNextMonth}','dd/mm/rrrr')
 
           `;
 
