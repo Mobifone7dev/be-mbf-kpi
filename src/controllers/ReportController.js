@@ -94,11 +94,11 @@ class ReportController {
     if (monthString && startOfMonth) {
       let sql;
       sql = `
-            SELECT * from select * from db01_owner.th_tb_ptsl_ts_detail
-            where thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+            SELECT * from  db01_owner.th_tb_ptsl_ts_detail
+            where active_date = TO_DATE('${startOfMonth}','dd/mm/rrrr')
            union all 
            select * from db01_owner.th_tb_ptsl_tt_detail
-            where thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+            where active_date = TO_DATE('${startOfMonth}','dd/mm/rrrr')
 
           `;
 
