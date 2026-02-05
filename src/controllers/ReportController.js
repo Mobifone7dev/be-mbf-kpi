@@ -12,9 +12,7 @@ const { query, validationResult } = require("express-validator");
 
 class ReportController {
   index(req, res) {
-
     res.send({ result: "hello wolrd " + req.path });
-
   }
 
   async getReportCodeByMonth(req, res) {
@@ -76,8 +74,6 @@ class ReportController {
             ) t
             ORDER BY thang, goi_cuoc
           `;
-
-
 
       DbConnection.getConnected(sql, {}, function (result) {
         if (result) {
