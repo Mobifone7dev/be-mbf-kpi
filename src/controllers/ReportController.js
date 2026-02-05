@@ -41,8 +41,8 @@ class ReportController {
                     a.goi_cuoc,
                     b.area_code,
                     NVL(a.trong_tinh,0) + NVL(a.ngoai_tinh,0) AS sl_tb
-                FROM th_tb_ptsl_th_bc03_show a
-                LEFT JOIN map_area_ward_new b
+                FROM db01_owner.th_tb_ptsl_th_bc03_show a
+                LEFT JOIN db01_owner.map_area_ward_new b
                     ON a.precinct_code = b.ward_code
             )
             PIVOT (
@@ -69,7 +69,7 @@ class ReportController {
                     'DLA_D06' AS DLA_D06
                 )
             )
-            where month = TO_DATE('${startOfMonth}','dd/mm/rrrr')
+            where thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
             ORDER BY thang, goi_cuoc
             ) t
             ORDER BY thang, goi_cuoc
