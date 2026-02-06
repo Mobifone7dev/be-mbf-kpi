@@ -37,7 +37,7 @@ class ReportController {
                     GROUP BY ward_code
                 ) b
                   ON a.precinct_code = b.ward_code
-                WHERE a.thang = DATE '2026-02-01'
+                WHERE a.thang = TO_DATE('${startOfMonth}','dd/mm/rrrr')
                 GROUP BY
                     a.thang,
                     a.goi_cuoc,
